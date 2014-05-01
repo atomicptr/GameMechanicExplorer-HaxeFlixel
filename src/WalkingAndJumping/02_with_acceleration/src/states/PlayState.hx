@@ -17,9 +17,10 @@ class PlayState extends FlxState {
 	private var player:FlxSprite;
 	private var ground:FlxGroup;
 	
-	// define movement constant
+	// define movement constants
 	private var MAX_SPEED:Int = 250;
-
+	private var ACCELERATION:Int = 600;
+	
 	// setup the example
 	public override function create():Void {
 		super.create();
@@ -33,6 +34,9 @@ class PlayState extends FlxState {
 		
 		player.x = FlxG.width / 2;
 		player.y = FlxG.height - 64;
+		
+		// set player maximum movement speed
+		player.maxVelocity.x = this.MAX_SPEED;
 		
 		// create the ground
 		ground = new FlxGroup();
@@ -66,13 +70,14 @@ class PlayState extends FlxState {
 		
 		if(FlxG.keys.anyPressed(["LEFT"])) {
 			// If the LEFT key is down, set the players velocity to move left
-			player.velocity.x = -this.MAX_SPEED;
+			player.acceleration.x = -this.ACCELERATION;
 		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
 			// If the RIGHT key is down, set the players velocity to move right
-			player.velocity.x = this.MAX_SPEED;
+			player.acceleration.x = this.ACCELERATION;
 		} else {
 			// Stop the player from moving horizontally
 			player.velocity.x = 0;
+			player.acceleration.x = 0;
 		}
 		
 		// Collide the player with the ground
