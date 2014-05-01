@@ -4,7 +4,7 @@ $(document).ready(function() {
 	document.title = EXAMPLE_NAME + " - " + document.title;
 	
 	$("#example-title").text(EXAMPLE_NAME);
-	$("#example-notes").text(EXAMPLE_NOTES);
+	$("#example-notes").html(EXAMPLE_NOTES);
 	
 	$("#back-text").text("\"" + BACK_TEXT + "\"");
 	$("#back-link").attr("href", BACK_LINK);
