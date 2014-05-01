@@ -1,4 +1,4 @@
-bin
+bin/*
 *.db
 
 !bin/html5
