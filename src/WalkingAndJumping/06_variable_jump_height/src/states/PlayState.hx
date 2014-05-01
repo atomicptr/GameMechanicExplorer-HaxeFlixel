@@ -19,6 +19,7 @@ class PlayState extends FlxState {
 	private var ground:FlxGroup;
 	private var variableJumpTimer:FlxTimer;
 	
+	// set a flag for tracking if the timer is already started
 	private var timerStarted = false;
 	
 	// Set a variable that is true when the player is touching the ground
@@ -140,8 +141,10 @@ class PlayState extends FlxState {
 			}
 		}
 		
+		// keep y velocity constant while the jump button is held for up to 400ms (default value)
 		if(canVariableJump && FlxG.keys.anyPressed(["UP"])) {
-			// call variable jump timer
+			
+			// start timer
 			if(!timerStarted) {
 				variableJumpTimer.start(VARIABLE_JUMP_TIME, onVariableJumpEnds, 1);
 				
@@ -153,6 +156,7 @@ class PlayState extends FlxState {
 			onTheGround = false;
 		}
 		
+		// don't allow variable jump height after jump button is released
 		if(!FlxG.keys.anyPressed(["UP"])) {
 			canVariableJump = false;
 		}
@@ -176,11 +180,11 @@ class PlayState extends FlxState {
 		player.acceleration.y = 0;
 	}
 	
+	// callback when the variable jump ends
 	private function onVariableJumpEnds(timer:FlxTimer) {
 		this.canVariableJump = false;
 		
+		// reset variable to use timer again
 		timerStarted = false;
-		
-		trace("timer done");
 	}
 }
