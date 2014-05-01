@@ -1,0 +1,32 @@
+body {
+	padding-top: 50px;
+}
+
+.game-container {
+	text-align: center;
+}
+
+#brand-logo {
+	width: 24px;
+	height: 24px;
+
+	padding-bottom: 3px;
+}
+
+.github-icon {
+	padding-bottom: 3px;
+}
+
+.content-container {
+	text-align: left;
+}
+
+.code-container {
+	margin-bottom: 50px;
+	text-align: left;
+}
+
+.footer {
+	text-align: center;
+	margin-bottom: 10px;
+}

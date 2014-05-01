@@ -18,7 +18,7 @@ class GameClass extends FlxGame {
 	var framerate:Int = 60;
 	
 	// Whether to skip the flixel splash screen that appears in release mode.
-	var skipSplash:Bool = false; 
+	var skipSplash:Bool = true; 
 	
 	// Whether to start the game in fullscreen on desktop targets
 	var startFullscreen:Bool = false; 
