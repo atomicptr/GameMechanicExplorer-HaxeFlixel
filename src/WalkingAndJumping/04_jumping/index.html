@@ -3,12 +3,12 @@
 
 <!-- settings -->
 <script>
-	EXAMPLE_NAME = "With Drag";
-	EXAMPLE_NOTES = "Use the arrow keys to move the player left and right.<br/>" +
-		"<br/>The player now has a DRAG component. DRAG works by applying a velocity in the opposite direction of the player movement " +
-		"whenever the player is not accelerating. This causes the player to slow down gradually when no keys are pressed. Note that " +
-		"ACCELERATION is greater than DRAG. This allows the player to slow down and change direction faster by pressing the opposite " +
-		"arrow key; or to coast to a stop by releasing all of the keys.";
+	EXAMPLE_NAME = "Jumping";
+	EXAMPLE_NOTES = "Use the arrow keys to move the player left and right. Press the up arrow to jump.<br/>" +
+		"<br/>Jumping is a combination of two things: an upward velocity and gravity. When the up arrow is pressed " +
+		"and the player is touching the ground, an upward velocity is added to the player. Gravity then accelerates the " +
+		"character back towards the ground. The parabolic path of the player while jumping is simply a result of the " +
+		"player being affected by gravity.";
 	
 	BACK_TEXT = "Walking and Jumping";
 	BACK_LINK = "..";

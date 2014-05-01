@@ -23,6 +23,7 @@ ApplicationMain.main = function() {
 	ApplicationMain.loadSound("assets/sounds/beep.ogg");
 	ApplicationMain.loadSound("assets/sounds/flixel.ogg");
 	ApplicationMain.loadFile("assets/ground.png");
+	ApplicationMain.loadFile("assets/heightmarker.png");
 	ApplicationMain.loadFile("assets/player.png");
 	var resourcePrefix = "NME_:bitmap_";
 	var _g = 0;
@@ -813,6 +814,7 @@ var DefaultAssetLibrary = function() {
 	this.addExternal("assets/sounds/beep.ogg","sound","assets/sounds/beep.ogg");
 	this.addExternal("assets/sounds/flixel.ogg","sound","assets/sounds/flixel.ogg");
 	this.addExternal("assets/ground.png","image","assets/ground.png");
+	this.addExternal("assets/heightmarker.png","image","assets/heightmarker.png");
 	this.addExternal("assets/player.png","image","assets/player.png");
 };
 $hxClasses["DefaultAssetLibrary"] = DefaultAssetLibrary;
@@ -21038,9 +21040,12 @@ openfl.AssetType.TEXT.toString = $estr;
 openfl.AssetType.TEXT.__enum__ = openfl.AssetType;
 var states = {};
 states.PlayState = function(MaxSize) {
+	this.JUMP_SPEED = -600;
+	this.GRAVITY = 980;
 	this.DRAG = 400;
 	this.ACCELERATION = 600;
 	this.MAX_SPEED = 250;
+	this.onTheGround = true;
 	flixel.FlxState.call(this,MaxSize);
 };
 $hxClasses["states.PlayState"] = states.PlayState;
@@ -21049,9 +21054,12 @@ states.PlayState.__super__ = flixel.FlxState;
 states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 	player: null
 	,ground: null
+	,onTheGround: null
 	,MAX_SPEED: null
 	,ACCELERATION: null
 	,DRAG: null
+	,GRAVITY: null
+	,JUMP_SPEED: null
 	,create: function() {
 		flixel.FlxState.prototype.create.call(this);
 		flixel.FlxG.cameras.set_bgColor(-12285748);
@@ -21060,6 +21068,7 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 		this.player.set_x(flixel.FlxG.width / 2);
 		this.player.set_y(flixel.FlxG.height - 64);
 		this.player.maxVelocity.set_x(this.MAX_SPEED);
+		this.player.maxVelocity.set_y(this.MAX_SPEED * 10);
 		this.player.drag.set_x(this.DRAG);
 		this.ground = new flixel.group.FlxGroup();
 		var _g1 = 0;
@@ -21072,8 +21081,23 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 			groundBlock.set_immovable(true);
 			this.ground.add(groundBlock);
 		}
+		var heightMarkers = new flixel.group.FlxGroup();
+		var y = flixel.FlxG.height - 32;
+		while(y >= 64) {
+			var _g11 = 0;
+			var _g2 = flixel.FlxG.width / 32 | 0;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				var x1 = i1 * 32;
+				var marker = new flixel.FlxSprite(x1,y);
+				marker.loadGraphic("assets/heightmarker.png");
+				heightMarkers.add(marker);
+			}
+			y -= 32;
+		}
 		this.add(this.ground);
 		this.add(this.player);
+		this.add(heightMarkers);
 	}
 	,destroy: function() {
 		flixel.FlxState.prototype.destroy.call(this);
@@ -21081,7 +21105,16 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 	,update: function() {
 		flixel.FlxState.prototype.update.call(this);
 		if(flixel.FlxG.keys.checkKeyStatus(["LEFT"],1)) this.player.acceleration.set_x(-this.ACCELERATION); else if(flixel.FlxG.keys.checkKeyStatus(["RIGHT"],1)) this.player.acceleration.set_x(this.ACCELERATION); else this.player.acceleration.set_x(0);
-		flixel.FlxG.overlap(this.player,this.ground,null,flixel.FlxObject.separate);
+		if(this.onTheGround && flixel.FlxG.keys.checkKeyStatus(["UP"],1)) {
+			this.player.velocity.set_y(this.JUMP_SPEED);
+			this.onTheGround = false;
+		}
+		if(!this.onTheGround) this.player.acceleration.set_y(this.GRAVITY);
+		flixel.FlxG.overlap(this.player,this.ground,$bind(this,this.onGround),flixel.FlxObject.separate);
+	}
+	,onGround: function(player,groundBlock) {
+		this.onTheGround = true;
+		player.acceleration.set_y(0);
 	}
 	,__class__: states.PlayState
 });

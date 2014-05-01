@@ -17,10 +17,15 @@ class PlayState extends FlxState {
 	private var player:FlxSprite;
 	private var ground:FlxGroup;
 	
+	// Set a variable that is true when the player is touching the ground
+	private var onTheGround = true;
+	
 	// define movement constants
 	private var MAX_SPEED:Int = 250;
 	private var ACCELERATION:Int = 600;
 	private var DRAG:Int = 400;
+	private var GRAVITY:Int = 980;
+	private var JUMP_SPEED:Int = -600; // negative y is up
 	
 	// setup the example
 	public override function create():Void {
@@ -38,6 +43,7 @@ class PlayState extends FlxState {
 		
 		// set player maximum movement speed
 		player.maxVelocity.x = this.MAX_SPEED;
+		player.maxVelocity.y = this.MAX_SPEED * 10;
 		
 		// add drag to the player that slows them down when they are not accelerating
 		player.drag.x = this.DRAG;
@@ -59,9 +65,30 @@ class PlayState extends FlxState {
 			ground.add(groundBlock);
 		}
 		
+		// add some height markers
+		var heightMarkers:FlxGroup = new FlxGroup();
+		
+		var y = FlxG.height - 32;
+		
+		while(y >= 64) {
+			
+			for(i in 0...Std.int(FlxG.width / 32)) {
+				var x = i * 32;
+				
+				var marker = new FlxSprite(x, y);
+				
+				marker.loadGraphic("assets/heightmarker.png");
+				
+				heightMarkers.add(marker);
+			}
+			
+			y -= 32;
+		}
+		
 		// add ground group and player to the stage
 		this.add(ground);
 		this.add(player);
+		this.add(heightMarkers);
 	}
 	
 	public override function destroy():Void {
@@ -82,7 +109,27 @@ class PlayState extends FlxState {
 			player.acceleration.x = 0;
 		}
 		
-		// Collide the player with the ground
-		FlxG.collide(player, ground);
-	}	
+		if(onTheGround && FlxG.keys.anyPressed(["UP"])) {
+			// Jump when the player is touching the ground an the up arrow is pressed;
+			player.velocity.y = this.JUMP_SPEED;
+			
+			onTheGround = false;
+		}
+		
+		// when not on the ground use gravity
+		if(!onTheGround) {
+			player.acceleration.y = this.GRAVITY;
+		}
+		
+		// Collide the player with the ground, call onGround method when player hits ground
+		FlxG.collide(player, ground, onGround);
+	}
+	
+	// player is now on ground
+	private function onGround(player:FlxSprite, groundBlock:FlxSprite) {
+		this.onTheGround = true;
+		
+		// we're now back on the ground, disable gravity
+		player.acceleration.y = 0;
+	}
 }

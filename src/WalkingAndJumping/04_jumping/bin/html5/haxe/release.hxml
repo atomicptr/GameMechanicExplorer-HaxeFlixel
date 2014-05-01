@@ -9,7 +9,7 @@
 -D bitfive
 -D html5
 -D web
--js bin/html5/bin/gme_with_drag.js
+-js bin/html5/bin/gme_jumping.js
 -cp bin/html5/haxe
 -D html5
 -D html

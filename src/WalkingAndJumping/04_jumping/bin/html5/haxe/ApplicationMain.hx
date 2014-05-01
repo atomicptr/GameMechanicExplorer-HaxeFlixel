@@ -42,6 +42,7 @@ class ApplicationMain {
 		loadSound("assets/sounds/beep.ogg");
 		loadSound("assets/sounds/flixel.ogg");
 		loadFile("assets/ground.png");
+		loadFile("assets/heightmarker.png");
 		loadFile("assets/player.png");
 		
 		// bitmaps:

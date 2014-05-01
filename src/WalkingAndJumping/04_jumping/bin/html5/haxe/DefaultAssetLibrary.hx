@@ -46,6 +46,8 @@ class DefaultAssetLibrary extends AssetLibrary {
 		type.set ("assets/sounds/flixel.ogg", Reflect.field (AssetType, "sound".toUpperCase ()));
 		className.set ("assets/ground.png", __ASSET__assets_ground_png);
 		type.set ("assets/ground.png", Reflect.field (AssetType, "image".toUpperCase ()));
+		className.set ("assets/heightmarker.png", __ASSET__assets_heightmarker_png);
+		type.set ("assets/heightmarker.png", Reflect.field (AssetType, "image".toUpperCase ()));
 		className.set ("assets/player.png", __ASSET__assets_player_png);
 		type.set ("assets/player.png", Reflect.field (AssetType, "image".toUpperCase ()));
 		
@@ -57,6 +59,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 		addExternal("assets/sounds/beep.ogg", "sound", "assets/sounds/beep.ogg");
 		addExternal("assets/sounds/flixel.ogg", "sound", "assets/sounds/flixel.ogg");
 		addExternal("assets/ground.png", "image", "assets/ground.png");
+		addExternal("assets/heightmarker.png", "image", "assets/heightmarker.png");
 		addExternal("assets/player.png", "image", "assets/player.png");
 		
 		
@@ -80,6 +83,9 @@ class DefaultAssetLibrary extends AssetLibrary {
 		
 		className.set ("assets/ground.png", __ASSET__assets_ground_png);
 		type.set ("assets/ground.png", Reflect.field (AssetType, "image".toUpperCase ()));
+		
+		className.set ("assets/heightmarker.png", __ASSET__assets_heightmarker_png);
+		type.set ("assets/heightmarker.png", Reflect.field (AssetType, "image".toUpperCase ()));
 		
 		className.set ("assets/player.png", __ASSET__assets_player_png);
 		type.set ("assets/player.png", Reflect.field (AssetType, "image".toUpperCase ()));
@@ -671,10 +677,12 @@ class DefaultAssetLibrary extends AssetLibrary {
 @:keep class __ASSET__assets_sounds_beep_ogg extends null { }
 @:keep class __ASSET__assets_sounds_flixel_ogg extends null { }
 @:keep class __ASSET__assets_ground_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
+@:keep class __ASSET__assets_heightmarker_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep class __ASSET__assets_player_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 
 
 #elseif html5
+
 
 
 
@@ -692,6 +700,7 @@ class DefaultAssetLibrary extends AssetLibrary {
 @:sound("B:/Programs/Haxe/haxe/lib/flixel/3,3,1/assets/sounds/beep.ogg") class __ASSET__assets_sounds_beep_ogg extends flash.media.Sound {}
 @:sound("B:/Programs/Haxe/haxe/lib/flixel/3,3,1/assets/sounds/flixel.ogg") class __ASSET__assets_sounds_flixel_ogg extends flash.media.Sound {}
 @:bitmap("assets/ground.png") class __ASSET__assets_ground_png extends flash.display.BitmapData {}
+@:bitmap("assets/heightmarker.png") class __ASSET__assets_heightmarker_png extends flash.display.BitmapData {}
 @:bitmap("assets/player.png") class __ASSET__assets_player_png extends flash.display.BitmapData {}
 
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<app title="GME - With Drag" file="gme_with_drag" main="Main" version="1.0.0" company="Christopher Kaster" />
+	<app title="GME - Jumping" file="gme_jumping" main="Main" version="1.0.0" company="Christopher Kaster" />
 	<app preloader="flixel.system.FlxPreloader" />
 	
 	<window width="800" height="480" fps="60" hardware="true" vsync="true" />
