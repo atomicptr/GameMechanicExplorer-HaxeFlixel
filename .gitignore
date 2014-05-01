@@ -1,2 +1,4 @@
 bin
 *.db
+
+!bin/html5
