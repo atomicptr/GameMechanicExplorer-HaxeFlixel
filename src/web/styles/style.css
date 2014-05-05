@@ -31,3 +31,11 @@ body {
 	margin-top: 10px;
 	margin-bottom: 10px;
 }
+
+.list-group-menu-hover-hack:hover {
+	background-color: #daedf8 !important;
+}
+
+.list-group-stupid-thing {
+	background-color: white !important;
+}
