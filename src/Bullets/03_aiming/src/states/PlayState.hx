@@ -47,7 +47,7 @@ class PlayState extends FlxState {
 		// fill the bulletPool with the maximum number of bullets that can exist at once
 		for(i in 0...NUMBER_OF_BULLETS) {
 			// create bullet
-			var bullet = new FlxSprite(this.gun.x, this.gun.y);
+			var bullet = new FlxSprite(gun.x, gun.y);
 			bullet.loadGraphic("assets/bullet.png");
 
 			// add bullet to pool
@@ -58,8 +58,8 @@ class PlayState extends FlxState {
 		}
 
 		// add gun and bulletPool to this FlxState (this is what causes them to update and draw)
-		this.add(gun);
-		this.add(bulletPool);
+		add(gun);
+		add(bulletPool);
 	}
 
 	public override function destroy():Void {
@@ -72,10 +72,10 @@ class PlayState extends FlxState {
 		elapsed += FlxG.elapsed;
 
 		// set the gun angle
-		this.gun.angle = FlxAngle.angleBetweenMouse(this.gun, true);
+		gun.angle = FlxAngle.angleBetweenMouse(gun, true);
 
 		// if primary mouse button is pressed and enough time has elapsed since last shot
-		if(FlxG.mouse.pressed && elapsed >= this.SHOT_DELAY) {
+		if(FlxG.mouse.pressed && elapsed >= SHOT_DELAY) {
 			shootBullet();
 			// reset elapsed
 			elapsed = 0;
@@ -104,13 +104,13 @@ class PlayState extends FlxState {
 		bullet.revive();
 
 		// Set the bullet position to the gun position.
-		bullet.reset(this.gun.x, this.gun.y);
+		bullet.reset(gun.x, gun.y);
 
 		// set the bullet angle
 		bullet.angle = FlxAngle.angleBetweenMouse(bullet, true);
 
 		// Shoot in the right direction! Peng!
-		bullet.velocity.x = Math.cos(bullet.angle * FlxAngle.TO_RAD) * this.BULLET_SPEED;
-		bullet.velocity.y = Math.sin(bullet.angle * FlxAngle.TO_RAD) * this.BULLET_SPEED;
+		bullet.velocity.x = Math.cos(bullet.angle * FlxAngle.TO_RAD) * BULLET_SPEED;
+		bullet.velocity.y = Math.sin(bullet.angle * FlxAngle.TO_RAD) * BULLET_SPEED;
 	}
 }
