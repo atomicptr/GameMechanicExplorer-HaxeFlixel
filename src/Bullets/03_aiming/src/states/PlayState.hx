@@ -75,7 +75,7 @@ class PlayState extends FlxState {
 		this.gun.angle = FlxAngle.angleBetweenMouse(this.gun, true);
 
 		// if primary mouse button is pressed and enough time has elapsed since last shot
-		if(FlxG.mouse.pressed && elapsed < this.SHOT_DELAY) {
+		if(FlxG.mouse.pressed && elapsed >= this.SHOT_DELAY) {
 			shootBullet();
 			// reset elapsed
 			elapsed = 0;
