@@ -2557,7 +2557,7 @@ flash.display.BitmapData.prototype = {
 	}
 	,getPixel: function(x,y) {
 		if(x < 0 || y < 0 || x >= this.component.width || y >= this.component.height) return 0;
-		if((this.qSync & 3) == 1) {
+		if(!((this.qSync & 3) != 1)) {
 			var d = this.qContext.getImageData(x,y,1,1).data;
 			return d[0] << 16 | d[1] << 8 | d[2];
 		} else {
@@ -2567,7 +2567,7 @@ flash.display.BitmapData.prototype = {
 	}
 	,getPixel32: function(x,y) {
 		if(x < 0 || y < 0 || x >= this.component.width || y >= this.component.height) return 0;
-		if((this.qSync & 3) == 1) {
+		if(!((this.qSync & 3) != 1)) {
 			var d = this.qContext.getImageData(x,y,1,1).data;
 			return (this.qTransparent?d[3] << 24:-16777216) | d[0] << 16 | d[1] << 8 | d[2];
 		} else {
@@ -2609,6 +2609,74 @@ flash.display.BitmapData.prototype = {
 			this.qImageData.data[o + 2] = color & 255;
 			this.qImageData.data[o + 3] = color >>> 24 & 255;
 			this.qSync |= 6;
+		}
+	}
+	,getPixels: function(q) {
+		var d;
+		var v;
+		var r = new flash.utils.ByteArray();
+		var u;
+		var qx = q.x | 0;
+		var qy = q.y | 0;
+		var qw = q.width | 0;
+		var qh = q.height | 0;
+		var i = 0;
+		var j;
+		var l = qw * qh * 4;
+		r.set_length(l);
+		v = r.data;
+		if(!((this.qSync & 3) != 1)) {
+			d = this.qContext.getImageData(qx,qy,qw,qh);
+			u = d.data;
+			while(i < l) r.writeUnsignedInt(u[i++] << 16 | u[i++] << 8 | u[i++] | u[i++] << 24);
+		} else {
+			u = this.qImageData.data;
+			if(qx == 0 && qy == 0 && qw == this.component.width && qh == this.component.height) while(i < l) r.writeUnsignedInt(u[i++] << 16 | u[i++] << 8 | u[i++] | u[i++] << 24); else while(qh-- > 0) {
+				i = (qx + qy++ * (j = qw)) * 4;
+				while(j-- > 0) r.writeUnsignedInt(u[i++] << 16 | u[i++] << 8 | u[i++] | u[i++] << 24);
+			}
+		}
+		return r;
+	}
+	,setPixels: function(q,r) {
+		var qx = q.x | 0;
+		var qy = q.y | 0;
+		var qw = q.width | 0;
+		var qh = q.height | 0;
+		var i = 0;
+		var j;
+		var l = qw * qh * 4;
+		var p;
+		var w = this.component.width;
+		var d;
+		var u;
+		if((this.qSync & 3) != 2) {
+			d = this.qContext.createImageData(qw,qh);
+			u = d.data;
+			while(i < l) {
+				p = r.readUnsignedInt();
+				u[i] = p >> 16 & 255;
+				u[i + 1] = p >> 8 & 255;
+				u[i + 2] = p & 255;
+				u[i + 3] = p >>> 24 & 255;
+				i += 4;
+			}
+			this.qContext.putImageData(d,qx,qy);
+			haxe.Log.trace("?",{ fileName : "BitmapData.hx", lineNumber : 373, className : "flash.display.BitmapData", methodName : "setPixels"});
+		} else {
+			u = this.qImageData.data;
+			while(qh-- > 0) {
+				i = (qx + qy++ * w) * 4;
+				j = qw;
+				while(j-- > 0) {
+					p = r.readUnsignedInt();
+					u[i] = p >> 16 & 255;
+					u[i + 1] = p >> 8 & 255;
+					u[i + 2] = p & 255;
+					u[i + 3] = p >>> 24 & 255;
+					i += 4;
+				}
+			}
 		}
 	}
 	,getColorBoundsRect: function(mask,color,findColor) {
@@ -5898,7 +5966,7 @@ flixel.util.FlxPool_flixel_util_FlxPoint.prototype = {
 		return obj;
 	}
 	,put: function(obj) {
-		if(obj != null && flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPool_T(this._pool,obj) < 0) {
+		if(obj != null && HxOverrides.indexOf(this._pool,obj,0) < 0) {
 			obj.destroy();
 			this._pool.push(obj);
 		}
@@ -6258,10 +6326,9 @@ flixel.system.frontEnds.BitmapFrontEnd.prototype = {
 	,remove: function(key) {
 		if(key != null && this._cache.exists(key)) {
 			var obj = this._cache.get(key);
-			if(this.inOpenFlAssets(obj.bitmap) == false) {
-				this._cache.remove(key);
-				obj.destroy();
-			}
+			openfl.Assets.cache.bitmapData.remove(key);
+			this._cache.remove(key);
+			obj.destroy();
 		}
 	}
 	,clearCache: function() {
@@ -6271,25 +6338,43 @@ flixel.system.frontEnds.BitmapFrontEnd.prototype = {
 		while( $it0.hasNext() ) {
 			var key = $it0.next();
 			obj = this._cache.get(key);
-			if(obj != null && !obj.persist && this.inOpenFlAssets(obj.bitmap) == false) {
+			if(obj != null && !obj.persist) {
+				openfl.Assets.cache.bitmapData.remove(key);
 				this._cache.remove(key);
 				obj.destroy();
 				obj = null;
 			}
 		}
 	}
-	,inOpenFlAssets: function(bitmap) {
-		var bitmapDataCache = openfl.Assets.cache.bitmapData;
-		if(bitmapDataCache != null) {
-			var $it0 = bitmapDataCache.iterator();
+	,clearUnused: function() {
+		var obj;
+		if(this._cache != null) {
+			var $it0 = this._cache.keys();
 			while( $it0.hasNext() ) {
-				var bd = $it0.next();
-				if(bd == bitmap) return true;
+				var key = $it0.next();
+				obj = this._cache.get(key);
+				if(obj != null && obj.useCount <= 0 && !obj.persist && obj.destroyOnNoUse) this.remove(obj.key);
 			}
 		}
-		return false;
 	}
 	,__class__: flixel.system.frontEnds.BitmapFrontEnd
+};
+flixel.system.frontEnds.BitmapLogFrontEnd = function() {
+};
+$hxClasses["flixel.system.frontEnds.BitmapLogFrontEnd"] = flixel.system.frontEnds.BitmapLogFrontEnd;
+flixel.system.frontEnds.BitmapLogFrontEnd.__name__ = ["flixel","system","frontEnds","BitmapLogFrontEnd"];
+flixel.system.frontEnds.BitmapLogFrontEnd.prototype = {
+	add: function(Data,Name) {
+		if(Name == null) Name = "";
+	}
+	,clear: function() {
+	}
+	,clearAt: function(Index) {
+		if(Index == null) Index = -1;
+	}
+	,viewCache: function() {
+	}
+	,__class__: flixel.system.frontEnds.BitmapLogFrontEnd
 };
 flixel.system.frontEnds.CameraFrontEnd = function() {
 	this.useBufferLocking = false;
@@ -6382,7 +6467,7 @@ flixel.system.frontEnds.CameraFrontEnd.prototype = {
 			if(camera == null || !camera.exists || !camera.visible) continue;
 			camera.drawFX();
 			if(this.useBufferLocking) camera.buffer.unlock();
-			camera.screen.cachedGraphics.get_tilesheet().destroyFrameBitmapDatas();
+			camera.screen.dirty = true;
 		}
 	}
 	,update: function() {
@@ -6839,7 +6924,7 @@ js.Boot.__cast = function(o,t) {
 	if(js.Boot.__instanceof(o,t)) return o; else throw "Cannot cast " + Std.string(o) + " to " + Std.string(t);
 };
 flixel.system.frontEnds.PluginFrontEnd = function() {
-	this.list = new Array();
+	this.list = [];
 	this.add_flixel_plugin_PathManager(flixel.util.FlxPath.manager = new flixel.plugin.PathManager());
 	this.add_flixel_plugin_TimerManager(flixel.util.FlxTimer.manager = new flixel.plugin.TimerManager());
 	this.add_flixel_plugin_TweenManager(flixel.tweens.FlxTween.manager = new flixel.plugin.TweenManager());
@@ -6956,6 +7041,7 @@ flixel.util.FlxPath = function(Object,Nodes,Speed,Mode,AutoRotate) {
 	if(AutoRotate == null) AutoRotate = false;
 	if(Mode == null) Mode = 0;
 	if(Speed == null) Speed = 100;
+	this._inManager = false;
 	this._autoRotate = false;
 	this._inc = 1;
 	this._nodeIndex = 0;
@@ -6982,6 +7068,7 @@ flixel.util.FlxPath.prototype = {
 	,_mode: null
 	,_inc: null
 	,_autoRotate: null
+	,_inManager: null
 	,reset: function() {
 		this.autoCenter = true;
 		return this;
@@ -6999,7 +7086,10 @@ flixel.util.FlxPath.prototype = {
 		return this;
 	}
 	,restart: function() {
-		if(flixel.util.FlxPath.manager != null) flixel.util.FlxPath.manager.add(this);
+		if(flixel.util.FlxPath.manager != null && !this._inManager) {
+			flixel.util.FlxPath.manager.add(this);
+			this._inManager = true;
+		}
 		this.finished = false;
 		this.active = true;
 		if(this.nodes.length <= 0) this.active = false;
@@ -7132,7 +7222,10 @@ flixel.util.FlxPath.prototype = {
 	,cancel: function() {
 		this.finished = true;
 		if(this.object != null) this.object.velocity.set(0,0);
-		if(flixel.util.FlxPath.manager != null) flixel.util.FlxPath.manager.remove(this);
+		if(flixel.util.FlxPath.manager != null && this._inManager) {
+			flixel.util.FlxPath.manager.remove(this);
+			this._inManager = false;
+		}
 	}
 	,destroy: function() {
 		var _g = 0;
@@ -7173,7 +7266,7 @@ flixel.util.FlxPath.prototype = {
 		return this;
 	}
 	,remove: function(Node) {
-		var index = flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPoint(this.nodes,Node);
+		var index = HxOverrides.indexOf(this.nodes,Node,0);
 		if(index >= 0) return this.nodes.splice(index,1)[0]; else return null;
 	}
 	,removeAt: function(Index) {
@@ -7206,8 +7299,8 @@ flixel.plugin.FlxPlugin.prototype = $extend(flixel.FlxBasic.prototype,{
 	,__class__: flixel.plugin.FlxPlugin
 });
 flixel.plugin.PathManager = function() {
+	this._paths = [];
 	flixel.plugin.FlxPlugin.call(this);
-	this._paths = new Array();
 };
 $hxClasses["flixel.plugin.PathManager"] = flixel.plugin.PathManager;
 flixel.plugin.PathManager.__name__ = ["flixel","plugin","PathManager"];
@@ -7229,7 +7322,7 @@ flixel.plugin.PathManager.prototype = $extend(flixel.plugin.FlxPlugin.prototype,
 		}
 	}
 	,add: function(Path) {
-		if(flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPath(this._paths,Path) < 0) this._paths.push(Path);
+		this._paths.push(Path);
 	}
 	,remove: function(Path,ReturnInPool) {
 		if(ReturnInPool == null) ReturnInPool = true;
@@ -7245,6 +7338,7 @@ flixel.plugin.PathManager.prototype = $extend(flixel.plugin.FlxPlugin.prototype,
 });
 flixel.util.FlxTimer = function(Time,Callback,Loops) {
 	if(Loops == null) Loops = 1;
+	this._inManager = false;
 	this._loopsCounter = 0;
 	this._timeCounter = 0;
 	this.finished = false;
@@ -7264,13 +7358,17 @@ flixel.util.FlxTimer.prototype = {
 	,complete: null
 	,_timeCounter: null
 	,_loopsCounter: null
+	,_inManager: null
 	,destroy: function() {
 		this.complete = null;
 	}
 	,start: function(Time,Callback,Loops) {
 		if(Loops == null) Loops = 1;
 		if(Time == null) Time = 1;
-		if(flixel.util.FlxTimer.manager != null) flixel.util.FlxTimer.manager.add(this);
+		if(flixel.util.FlxTimer.manager != null && !this._inManager) {
+			flixel.util.FlxTimer.manager.add(this);
+			this._inManager = true;
+		}
 		this.active = true;
 		this.finished = false;
 		this.time = Math.abs(Time);
@@ -7289,7 +7387,10 @@ flixel.util.FlxTimer.prototype = {
 	}
 	,cancel: function() {
 		this.finished = true;
-		if(flixel.util.FlxTimer.manager != null) flixel.util.FlxTimer.manager.remove(this);
+		if(flixel.util.FlxTimer.manager != null && this._inManager) {
+			flixel.util.FlxTimer.manager.remove(this);
+			this._inManager = false;
+		}
 	}
 	,update: function() {
 		this._timeCounter += flixel.FlxG.elapsed;
@@ -7582,8 +7683,8 @@ flixel.tweens.FlxTween.prototype = {
 	,__properties__: {set_loopDelay:"set_loopDelay",set_startDelay:"set_startDelay",set_percent:"set_percent",get_percent:"get_percent",set_type:"set_type"}
 };
 flixel.plugin.TweenManager = function() {
+	this._tweens = [];
 	flixel.plugin.FlxPlugin.call(this);
-	this._tweens = new Array();
 	this.set_visible(false);
 };
 $hxClasses["flixel.plugin.TweenManager"] = flixel.plugin.TweenManager;
@@ -7989,7 +8090,7 @@ flixel.group.FlxTypedGroup.prototype = $extend(flixel.FlxBasic.prototype,{
 	}
 	,add: function(Object) {
 		if(Object == null) return null;
-		if(flixel.util.FlxArrayUtil.indexOf_flixel_group_FlxTypedGroup_T(this.members,Object) >= 0) return Object;
+		if(HxOverrides.indexOf(this.members,Object,0) >= 0) return Object;
 		var index = this.getFirstNull();
 		if(index != -1) {
 			this.members[index] = Object;
@@ -8029,13 +8130,13 @@ flixel.group.FlxTypedGroup.prototype = $extend(flixel.FlxBasic.prototype,{
 	,remove: function(Object,Splice) {
 		if(Splice == null) Splice = false;
 		if(this.members == null) return null;
-		var index = flixel.util.FlxArrayUtil.indexOf_flixel_group_FlxTypedGroup_T(this.members,Object);
+		var index = HxOverrides.indexOf(this.members,Object,0);
 		if(index < 0) return null;
 		if(Splice) this.members.splice(index,1); else this.members[index] = null;
 		return Object;
 	}
 	,replace: function(OldObject,NewObject) {
-		var index = flixel.util.FlxArrayUtil.indexOf_flixel_group_FlxTypedGroup_T(this.members,OldObject);
+		var index = HxOverrides.indexOf(this.members,OldObject,0);
 		if(index < 0) return null;
 		this.members[index] = NewObject;
 		return NewObject;
@@ -8283,7 +8384,7 @@ flixel.util.FlxPool_flixel_util_FlxRect.prototype = {
 		return obj;
 	}
 	,put: function(obj) {
-		if(obj != null && flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPool_T(this._pool,obj) < 0) {
+		if(obj != null && HxOverrides.indexOf(this._pool,obj,0) < 0) {
 			obj.destroy();
 			this._pool.push(obj);
 		}
@@ -9203,13 +9304,13 @@ flixel.FlxSprite.prototype = $extend(flixel.FlxObject.prototype,{
 		this.region.width = this.cachedGraphics.bitmap.component.width;
 		this.region.height = this.cachedGraphics.bitmap.component.height;
 		this.updateFrameData();
-		this.resetHelpers();
 		if(AutoBuffer) {
 			this.set_width(brush.component.width);
 			this.set_height(brush.component.height);
 			this.centerOffsets();
 		}
 		this.animation.createPrerotated();
+		this.resetHelpers();
 		return this;
 	}
 	,loadGraphicFromTexture: function(Data,Unique,FrameName) {
@@ -9241,8 +9342,10 @@ flixel.FlxSprite.prototype = $extend(flixel.FlxObject.prototype,{
 		var temp = this.loadGraphicFromTexture(Data);
 		if(temp == null) return null;
 		this.animation.set_frameName(Image);
+		var key = Std.string(Data.assetName) + ":" + Image;
 		var frameBitmapData = this.getFlxFrameBitmapData();
-		this.loadRotatedGraphic(frameBitmapData,Rotations,-1,AntiAliasing,AutoBuffer,Std.string(Data.assetName) + ":" + Image);
+		if(flixel.FlxG.bitmap.get(key) == null) frameBitmapData = frameBitmapData.clone();
+		this.loadRotatedGraphic(frameBitmapData,Rotations,-1,AntiAliasing,AutoBuffer,key);
 		return this;
 	}
 	,makeGraphic: function(Width,Height,Color,Unique,Key) {
@@ -9305,9 +9408,8 @@ flixel.FlxSprite.prototype = $extend(flixel.FlxObject.prototype,{
 		this._flashRect2.width = this.cachedGraphics.bitmap.component.width;
 		this._flashRect2.height = this.cachedGraphics.bitmap.component.height;
 		this.origin.set(this.frameWidth * 0.5,this.frameHeight * 0.5);
-		if(this.framePixels == null || this.framePixels.component.width != this.frameWidth || this.framePixels.component.height != this.frameHeight) this.framePixels = new flash.display.BitmapData(Std["int"](this.get_width()),Std["int"](this.get_height()));
-		this.framePixels.copyPixels(this.cachedGraphics.bitmap,this._flashRect,this._flashPointZero);
-		if(this.useColorTransform) this.framePixels.colorTransform(this._flashRect,this.colorTransform);
+		this.dirty = true;
+		this.getFlxFrameBitmapData();
 		this._halfWidth = this.frameWidth * 0.5;
 		this._halfHeight = this.frameHeight * 0.5;
 	}
@@ -9479,30 +9581,32 @@ flixel.FlxSprite.prototype = $extend(flixel.FlxObject.prototype,{
 	,calcFrame: function(RunOnCpp) {
 		if(RunOnCpp == null) RunOnCpp = false;
 		if(this.cachedGraphics == null) this.loadGraphic(flixel._FlxSprite.GraphicDefault);
-		if(this.frame != null) {
-			if(this.framePixels == null || this.framePixels.component.width != this.frameWidth || this.framePixels.component.height != this.frameHeight) {
-				if(this.framePixels != null) this.framePixels.dispose();
-				this.framePixels = new flash.display.BitmapData(this.frame.sourceSize.x | 0,this.frame.sourceSize.y | 0);
-			}
-			this.framePixels.copyPixels(this.getFlxFrameBitmapData(),this._flashRect,this._flashPointZero);
-		}
-		if(this.useColorTransform) this.framePixels.colorTransform(this._flashRect,this.colorTransform);
-		this.dirty = false;
+		this.getFlxFrameBitmapData();
 	}
 	,updateFrameData: function() {
 		if(this.cachedGraphics == null) return;
 		if(this.cachedGraphics.data != null && (this.region.tileWidth == 0 && this.region.tileHeight == 0)) this.framesData = this.cachedGraphics.get_tilesheet().getTexturePackerFrames(this.cachedGraphics.data); else this.framesData = this.cachedGraphics.get_tilesheet().getSpriteSheetFrames(this.region,null);
-		this.set_frame(this.framesData.frames[0]);
 		this.frames = this.framesData.frames.length;
+		this.animation.set_frameIndex(0);
+		this.set_frame(this.framesData.frames[0]);
 		this.set_width(this.frameWidth);
 		this.set_height(this.frameHeight);
 	}
 	,getFlxFrameBitmapData: function() {
-		var frameBmd = null;
-		if(this.frame != null) {
-			if(this.flipX && this.flipY) frameBmd = this.frame.getHVReversedBitmap(); else if(this.flipX) frameBmd = this.frame.getHReversedBitmap(); else if(this.flipY) frameBmd = this.frame.getVReversedBitmap(); else frameBmd = this.frame.getBitmap();
+		if(this.frame != null && this.dirty) {
+			if(!this.flipX && !this.flipY && this.frame.type == flixel.system.layer.frames.FrameType.REGULAR) this.framePixels = this.frame.paintOnBitmap(this.framePixels); else {
+				var frameBmd = null;
+				if(this.flipX && this.flipY) frameBmd = this.frame.getHVReversedBitmap(); else if(this.flipX) frameBmd = this.frame.getHReversedBitmap(); else if(this.flipY) frameBmd = this.frame.getVReversedBitmap(); else frameBmd = this.frame.getBitmap();
+				if(this.framePixels == null || this.framePixels.component.width != this.frameWidth || this.framePixels.component.height != this.frameHeight) {
+					if(this.framePixels != null) this.framePixels.dispose();
+					this.framePixels = new flash.display.BitmapData(this.frame.sourceSize.x | 0,this.frame.sourceSize.y | 0);
+				}
+				this.framePixels.copyPixels(frameBmd,this._flashRect,this._flashPointZero);
+			}
+			if(this.useColorTransform) this.framePixels.colorTransform(this._flashRect,this.colorTransform);
+			this.dirty = false;
 		}
-		return frameBmd;
+		return this.framePixels;
 	}
 	,getGraphicMidpoint: function(point) {
 		if(point == null) point = flixel.util.FlxPoint.get(null,null);
@@ -9925,7 +10029,7 @@ flixel.animation.FlxAnimation.prototype = $extend(flixel.animation.FlxBaseAnimat
 	,__properties__: $extend(flixel.animation.FlxBaseAnimation.prototype.__properties__,{get_numFrames:"get_numFrames",set_curFrame:"set_curFrame",set_frameRate:"set_frameRate"})
 });
 flixel.animation.FlxAnimationController = function(Sprite) {
-	this.frameIndex = 0;
+	this.frameIndex = -1;
 	this._sprite = Sprite;
 	this._animations = new haxe.ds.StringMap();
 };
@@ -10157,7 +10261,7 @@ flixel.animation.FlxAnimationController.prototype = {
 			var name = FrameNames[i];
 			if(this._sprite.framesData.framesHash.exists(name)) {
 				var frameToAdd = this._sprite.framesData.framesHash.get(name);
-				AddTo.push(flixel.util.FlxArrayUtil.indexOf_flixel_system_layer_frames_FlxFrame(this._sprite.framesData.frames,frameToAdd));
+				AddTo.push(HxOverrides.indexOf(this._sprite.framesData.frames,frameToAdd,0));
 			}
 		}
 	}
@@ -10169,7 +10273,7 @@ flixel.animation.FlxAnimationController.prototype = {
 			var name = Prefix + Indices[i] + Postfix;
 			if(this._sprite.framesData.framesHash.exists(name)) {
 				var frameToAdd = this._sprite.framesData.framesHash.get(name);
-				AddTo.push(flixel.util.FlxArrayUtil.indexOf_flixel_system_layer_frames_FlxFrame(this._sprite.framesData.frames,frameToAdd));
+				AddTo.push(HxOverrides.indexOf(this._sprite.framesData.frames,frameToAdd,0));
 			}
 		}
 	}
@@ -10193,7 +10297,7 @@ flixel.animation.FlxAnimationController.prototype = {
 		var _g = 0;
 		while(_g < l) {
 			var i = _g++;
-			AddTo.push(flixel.util.FlxArrayUtil.indexOf_flixel_system_layer_frames_FlxFrame(this._sprite.framesData.frames,AnimFrames[i]));
+			AddTo.push(HxOverrides.indexOf(this._sprite.framesData.frames,AnimFrames[i],0));
 		}
 	}
 	,findByPrefix: function(AnimFrames,Prefix) {
@@ -10224,7 +10328,7 @@ flixel.animation.FlxAnimationController.prototype = {
 				this._curAnim = null;
 			}
 			var frame = this._sprite.framesData.framesHash.get(Value);
-			if(frame != null) this.set_frameIndex(flixel.util.FlxArrayUtil.indexOf_flixel_system_layer_frames_FlxFrame(this._sprite.framesData.frames,frame));
+			if(frame != null) this.set_frameIndex(HxOverrides.indexOf(this._sprite.framesData.frames,frame,0));
 		}
 		return Value;
 	}
@@ -10274,7 +10378,7 @@ flixel.animation.FlxAnimationController.prototype = {
 		return this._sprite.frames;
 	}
 	,getFrameIndex: function(Frame) {
-		return flixel.util.FlxArrayUtil.indexOf_flixel_system_layer_frames_FlxFrame(this._sprite.framesData.frames,Frame);
+		return HxOverrides.indexOf(this._sprite.framesData.frames,Frame,0);
 	}
 	,__class__: flixel.animation.FlxAnimationController
 	,__properties__: {get_frames:"get_frames",set_finished:"set_finished",get_finished:"get_finished",set_paused:"set_paused",get_paused:"get_paused",set_name:"set_name",get_name:"get_name",set_frameName:"set_frameName",get_frameName:"get_frameName",set_frameIndex:"set_frameIndex",set_curAnim:"set_curAnim",get_curAnim:"get_curAnim"}
@@ -10327,7 +10431,7 @@ flixel.util.FlxPool_flixel_effects_FlxFlicker.prototype = {
 		return obj;
 	}
 	,put: function(obj) {
-		if(obj != null && flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPool_T(this._pool,obj) < 0) {
+		if(obj != null && HxOverrides.indexOf(this._pool,obj,0) < 0) {
 			obj.destroy();
 			this._pool.push(obj);
 		}
@@ -11189,10 +11293,7 @@ flixel.input.gamepad.FlxGamepad.prototype = {
 		return false;
 	}
 	,pressed: function(ButtonID) {
-		var pad = null;
-		var nav = navigator;
-		if(nav.webkitGetGamepads != null) pad = nav.webkitGetGamepads().item(this.id);
-		return pad != null && Math.round(pad.buttons[ButtonID]) == 1;
+		if(this.buttons[ButtonID] != null) return this.buttons[ButtonID].current > 0;
 		return false;
 	}
 	,justPressed: function(ButtonID) {
@@ -11268,6 +11369,7 @@ flixel.input.gamepad.FlxGamepad.prototype = {
 	,getAxisValue: function(AxisID) {
 		if(AxisID < 0 || AxisID >= this.axis.length) return 0;
 		var axisValue = 0;
+		axisValue = this.axis[AxisID];
 		if(Math.abs(axisValue) > this.deadZone) return axisValue;
 		return 0;
 	}
@@ -11715,6 +11817,9 @@ flixel.input.keyboard.FlxKeyList.prototype = {
 	,get_TAB: function() {
 		return flixel.FlxG.keys.checkStatus(9,this.checkStatus);
 	}
+	,get_PRINTSCREEN: function() {
+		return flixel.FlxG.keys.checkStatus(301,this.checkStatus);
+	}
 	,get_F1: function() {
 		return flixel.FlxG.keys.checkStatus(112,this.checkStatus);
 	}
@@ -11808,7 +11913,7 @@ flixel.input.keyboard.FlxKeyList.prototype = {
 		return flixel.FlxG.keys.checkStatus(keyCode,this.checkStatus);
 	}
 	,__class__: flixel.input.keyboard.FlxKeyList
-	,__properties__: {get_ANY:"get_ANY",get_NUMPADMULTIPLY:"get_NUMPADMULTIPLY",get_NUMPADPERIOD:"get_NUMPADPERIOD",get_NUMPADPLUS:"get_NUMPADPLUS",get_NUMPADMINUS:"get_NUMPADMINUS",get_NUMPADZERO:"get_NUMPADZERO",get_NUMPADNINE:"get_NUMPADNINE",get_NUMPADEIGHT:"get_NUMPADEIGHT",get_NUMPADSEVEN:"get_NUMPADSEVEN",get_NUMPADSIX:"get_NUMPADSIX",get_NUMPADFIVE:"get_NUMPADFIVE",get_NUMPADFOUR:"get_NUMPADFOUR",get_NUMPADTHREE:"get_NUMPADTHREE",get_NUMPADTWO:"get_NUMPADTWO",get_NUMPADONE:"get_NUMPADONE",get_F12:"get_F12",get_F11:"get_F11",get_F10:"get_F10",get_F9:"get_F9",get_F8:"get_F8",get_F7:"get_F7",get_F6:"get_F6",get_F5:"get_F5",get_F4:"get_F4",get_F3:"get_F3",get_F2:"get_F2",get_F1:"get_F1",get_TAB:"get_TAB",get_RIGHT:"get_RIGHT",get_LEFT:"get_LEFT",get_DOWN:"get_DOWN",get_UP:"get_UP",get_SPACE:"get_SPACE",get_ALT:"get_ALT",get_CONTROL:"get_CONTROL",get_GRAVEACCENT:"get_GRAVEACCENT",get_NUMPADSLASH:"get_NUMPADSLASH",get_SLASH:"get_SLASH",get_PERIOD:"get_PERIOD",get_COMMA:"get_COMMA",get_SHIFT:"get_SHIFT",get_ENTER:"get_ENTER",get_QUOTE:"get_QUOTE",get_SEMICOLON:"get_SEMICOLON",get_CAPSLOCK:"get_CAPSLOCK",get_BACKSLASH:"get_BACKSLASH",get_RBRACKET:"get_RBRACKET",get_LBRACKET:"get_LBRACKET",get_BACKSPACE:"get_BACKSPACE",get_DELETE:"get_DELETE",get_PLUS:"get_PLUS",get_MINUS:"get_MINUS",get_ESCAPE:"get_ESCAPE",get_INSERT:"get_INSERT",get_END:"get_END",get_HOME:"get_HOME",get_PAGEDOWN:"get_PAGEDOWN",get_PAGEUP:"get_PAGEUP",get_NINE:"get_NINE",get_EIGHT:"get_EIGHT",get_SEVEN:"get_SEVEN",get_SIX:"get_SIX",get_FIVE:"get_FIVE",get_FOUR:"get_FOUR",get_THREE:"get_THREE",get_TWO:"get_TWO",get_ONE:"get_ONE",get_ZERO:"get_ZERO",get_Z:"get_Z",get_Y:"get_Y",get_X:"get_X",get_W:"get_W",get_V:"get_V",get_U:"get_U",get_T:"get_T",get_S:"get_S",get_R:"get_R",get_Q:"get_Q",get_P:"get_P",get_O:"get_O",get_N:"get_N",get_M:"get_M",get_L:"get_L",get_K:"get_K",get_J:"get_J",get_I:"get_I",get_H:"get_H",get_G:"get_G",get_F:"get_F",get_E:"get_E",get_D:"get_D",get_C:"get_C",get_B:"get_B",get_A:"get_A"}
+	,__properties__: {get_ANY:"get_ANY",get_NUMPADMULTIPLY:"get_NUMPADMULTIPLY",get_NUMPADPERIOD:"get_NUMPADPERIOD",get_NUMPADPLUS:"get_NUMPADPLUS",get_NUMPADMINUS:"get_NUMPADMINUS",get_NUMPADZERO:"get_NUMPADZERO",get_NUMPADNINE:"get_NUMPADNINE",get_NUMPADEIGHT:"get_NUMPADEIGHT",get_NUMPADSEVEN:"get_NUMPADSEVEN",get_NUMPADSIX:"get_NUMPADSIX",get_NUMPADFIVE:"get_NUMPADFIVE",get_NUMPADFOUR:"get_NUMPADFOUR",get_NUMPADTHREE:"get_NUMPADTHREE",get_NUMPADTWO:"get_NUMPADTWO",get_NUMPADONE:"get_NUMPADONE",get_F12:"get_F12",get_F11:"get_F11",get_F10:"get_F10",get_F9:"get_F9",get_F8:"get_F8",get_F7:"get_F7",get_F6:"get_F6",get_F5:"get_F5",get_F4:"get_F4",get_F3:"get_F3",get_F2:"get_F2",get_F1:"get_F1",get_PRINTSCREEN:"get_PRINTSCREEN",get_TAB:"get_TAB",get_RIGHT:"get_RIGHT",get_LEFT:"get_LEFT",get_DOWN:"get_DOWN",get_UP:"get_UP",get_SPACE:"get_SPACE",get_ALT:"get_ALT",get_CONTROL:"get_CONTROL",get_GRAVEACCENT:"get_GRAVEACCENT",get_NUMPADSLASH:"get_NUMPADSLASH",get_SLASH:"get_SLASH",get_PERIOD:"get_PERIOD",get_COMMA:"get_COMMA",get_SHIFT:"get_SHIFT",get_ENTER:"get_ENTER",get_QUOTE:"get_QUOTE",get_SEMICOLON:"get_SEMICOLON",get_CAPSLOCK:"get_CAPSLOCK",get_BACKSLASH:"get_BACKSLASH",get_RBRACKET:"get_RBRACKET",get_LBRACKET:"get_LBRACKET",get_BACKSPACE:"get_BACKSPACE",get_DELETE:"get_DELETE",get_PLUS:"get_PLUS",get_MINUS:"get_MINUS",get_ESCAPE:"get_ESCAPE",get_INSERT:"get_INSERT",get_END:"get_END",get_HOME:"get_HOME",get_PAGEDOWN:"get_PAGEDOWN",get_PAGEUP:"get_PAGEUP",get_NINE:"get_NINE",get_EIGHT:"get_EIGHT",get_SEVEN:"get_SEVEN",get_SIX:"get_SIX",get_FIVE:"get_FIVE",get_FOUR:"get_FOUR",get_THREE:"get_THREE",get_TWO:"get_TWO",get_ONE:"get_ONE",get_ZERO:"get_ZERO",get_Z:"get_Z",get_Y:"get_Y",get_X:"get_X",get_W:"get_W",get_V:"get_V",get_U:"get_U",get_T:"get_T",get_S:"get_S",get_R:"get_R",get_Q:"get_Q",get_P:"get_P",get_O:"get_O",get_N:"get_N",get_M:"get_M",get_L:"get_L",get_K:"get_K",get_J:"get_J",get_I:"get_I",get_H:"get_H",get_G:"get_G",get_F:"get_F",get_E:"get_E",get_D:"get_D",get_C:"get_C",get_B:"get_B",get_A:"get_A"}
 };
 flixel.input.keyboard.FlxKeyboard = function() {
 	this.enabled = true;
@@ -11879,6 +11984,7 @@ flixel.input.keyboard.FlxKeyboard = function() {
 	this.addKey("LEFT",37);
 	this.addKey("RIGHT",39);
 	this.addKey("TAB",9);
+	this.addKey("PRINTSCREEN",301);
 	this.addKey("NUMPADMULTIPLY",106);
 	this.addKey("NUMPADMINUS",109);
 	this.addKey("NUMPADPLUS",107);
@@ -13572,7 +13678,7 @@ flixel.system.debug.ConsoleUtil.findCommand = function(Alias,Commands) {
 	var _g = Commands.length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		if(flixel.util.FlxArrayUtil.indexOf_String(Commands[i].aliases,Alias) != -1) return Commands[i];
+		if(HxOverrides.indexOf(Commands[i].aliases,Alias,0) != -1) return Commands[i];
 	}
 	return null;
 };
@@ -13731,6 +13837,7 @@ flixel.system.debug.Window = function(Title,Icon,Width,Height,Resizable,Bounds,C
 	if(Height == null) Height = 0;
 	if(Width == null) Width = 0;
 	flash.display.Sprite.call(this);
+	this.minSize = new flash.geom.Point(50,30);
 	this._width = Std["int"](Math.abs(Width));
 	this._height = Std["int"](Math.abs(Height));
 	this.updateBounds(Bounds);
@@ -13785,6 +13892,7 @@ flixel.system.debug.Window.__super__ = flash.display.Sprite;
 flixel.system.debug.Window.prototype = $extend(flash.display.Sprite.prototype,{
 	minSize: null
 	,maxSize: null
+	,toggleButton: null
 	,_width: null
 	,_height: null
 	,_bounds: null
@@ -13834,13 +13942,20 @@ flixel.system.debug.Window.prototype = $extend(flash.display.Sprite.prototype,{
 	}
 	,updateBounds: function(Bounds) {
 		this._bounds = Bounds;
-		this.minSize = new flash.geom.Point(50,30);
 		if(this._bounds != null) this.maxSize = new flash.geom.Point(this._bounds.width,this._bounds.height); else this.maxSize = new flash.geom.Point(1.79e+308,1.79e+308);
 	}
-	,toggleVisibility: function() {
-		this.set_visible(!this.visible);
+	,setVisible: function(Value) {
+		this.set_visible(Value);
 		flixel.FlxG.save.data.windowSettings[this._id] = this.visible;
 		flixel.FlxG.save.flush();
+		if(this.toggleButton != null) this.toggleButton.set_toggled(!this.visible);
+		if(this.visible) this.parent.addChild(this);
+	}
+	,toggleVisible: function() {
+		this.setVisible(!this.visible);
+	}
+	,putOnTop: function() {
+		this.parent.addChild(this);
 	}
 	,loadSaveData: function() {
 		if(flixel.FlxG.save.data.windowSettings != null) this.set_visible(flixel.FlxG.save.data.windowSettings[this._id]); else {
@@ -13894,6 +14009,7 @@ flixel.system.debug.Window.prototype = $extend(flash.display.Sprite.prototype,{
 			this._drag.x = this.get_mouseX();
 			this._drag.y = this.get_mouseY();
 		} else if(this._overHandle) {
+			this.parent.addChild(this);
 			this._resizing = true;
 			this._drag.x = this._width - this.get_mouseX();
 			this._drag.y = this._height - this.get_mouseY();
@@ -14084,6 +14200,7 @@ flixel.system.layer.TileSheetData = function(Bitmap) {
 	this.flxSpriteFrames = new haxe.ds.StringMap();
 	this.flxFrames = new haxe.ds.StringMap();
 	this.frameNames = new Array();
+	this.framesArr = new Array();
 };
 $hxClasses["flixel.system.layer.TileSheetData"] = flixel.system.layer.TileSheetData;
 flixel.system.layer.TileSheetData.__name__ = ["flixel","system","layer","TileSheetData"];
@@ -14092,6 +14209,7 @@ flixel.system.layer.TileSheetData.prototype = {
 	flxSpriteFrames: null
 	,flxFrames: null
 	,frameNames: null
+	,framesArr: null
 	,bitmap: null
 	,getFrame: function(name) {
 		return this.flxFrames.get(name);
@@ -14158,13 +14276,13 @@ flixel.system.layer.TileSheetData.prototype = {
 		var frame = new flixel.system.layer.frames.FlxFrame(this);
 		frame.name = key;
 		frame.frame = rect;
-		frame.rotated = false;
 		frame.trimmed = false;
 		frame.sourceSize.set(rect.width,rect.height);
 		frame.offset.set(0,0);
 		frame.center.set(0.5 * rect.width,0.5 * rect.height);
 		this.flxFrames.set(key,frame);
 		this.frameNames.push(key);
+		this.framesArr.push(frame);
 		return frame;
 	}
 	,containsFrame: function(key) {
@@ -14174,22 +14292,20 @@ flixel.system.layer.TileSheetData.prototype = {
 		this.bitmap = null;
 		var $it0 = this.flxSpriteFrames.iterator();
 		while( $it0.hasNext() ) {
-			var spriteData = $it0.next();
-			spriteData.destroy();
-		}
-		var $it1 = this.flxSpriteFrames.iterator();
-		while( $it1.hasNext() ) {
-			var frames = $it1.next();
+			var frames = $it0.next();
 			frames.destroy();
 		}
 		this.flxSpriteFrames = null;
-		var $it2 = this.flxFrames.iterator();
-		while( $it2.hasNext() ) {
-			var frame = $it2.next();
+		var _g = 0;
+		var _g1 = this.framesArr;
+		while(_g < _g1.length) {
+			var frame = _g1[_g];
+			++_g;
 			frame.destroy();
 		}
 		this.flxFrames = null;
 		this.frameNames = null;
+		this.framesArr = null;
 	}
 	,getTexturePackerFrames: function(data,startX,startY) {
 		if(startY == null) startY = 0;
@@ -14213,9 +14329,9 @@ flixel.system.layer.TileSheetData.prototype = {
 		if(startX == null) startX = 0;
 		var key = frameData.name;
 		if(this.flxFrames.exists(key)) return this.flxFrames.get(key);
-		var texFrame = new flixel.system.layer.frames.FlxFrame(this);
+		var texFrame = null;
+		if(frameData.rotated) texFrame = new flixel.system.layer.frames.FlxRotatedFrame(this); else texFrame = new flixel.system.layer.frames.FlxFrame(this);
 		texFrame.trimmed = frameData.trimmed;
-		texFrame.rotated = frameData.rotated;
 		texFrame.name = key;
 		texFrame.sourceSize.copyFrom(frameData.sourceSize);
 		texFrame.offset.copyFrom(frameData.offset);
@@ -14225,14 +14341,17 @@ flixel.system.layer.TileSheetData.prototype = {
 		texFrame.additionalAngle = frameData.additionalAngle;
 		this.flxFrames.set(key,texFrame);
 		this.frameNames.push(key);
+		this.framesArr.push(texFrame);
 		return texFrame;
 	}
 	,destroyFrameBitmapDatas: function() {
 		var numFrames = this.frameNames.length;
 		var _g = 0;
-		while(_g < numFrames) {
-			var i = _g++;
-			this.flxFrames.get(this.frameNames[i]).destroyBitmapDatas();
+		var _g1 = this.framesArr;
+		while(_g < _g1.length) {
+			var frame = _g1[_g];
+			++_g;
+			frame.destroyBitmapDatas();
 		}
 	}
 	,__class__: flixel.system.layer.TileSheetData
@@ -14458,48 +14577,52 @@ flixel.system.layer.frames.FlxFrame = function(tileSheet) {
 	this.additionalAngle = 0;
 	this.tileID = -1;
 	this.trimmed = false;
-	this.rotated = false;
 	this._tileSheet = tileSheet;
 	this.additionalAngle = 0;
 	this.sourceSize = flixel.util.FlxPoint.get(null,null);
 	this.offset = flixel.util.FlxPoint.get(null,null);
 	this.center = flixel.util.FlxPoint.get(null,null);
+	this.type = flixel.system.layer.frames.FrameType.REGULAR;
 };
 $hxClasses["flixel.system.layer.frames.FlxFrame"] = flixel.system.layer.frames.FlxFrame;
 flixel.system.layer.frames.FlxFrame.__name__ = ["flixel","system","layer","frames","FlxFrame"];
 flixel.system.layer.frames.FlxFrame.prototype = {
 	name: null
 	,frame: null
-	,rotated: null
 	,trimmed: null
 	,tileID: null
 	,additionalAngle: null
 	,sourceSize: null
 	,offset: null
 	,center: null
+	,type: null
 	,_bitmapData: null
 	,_hReversedBitmapData: null
 	,_vReversedBitmapData: null
 	,_hvReversedBitmapData: null
 	,_tileSheet: null
+	,paintOnBitmap: function(bmd) {
+		var result = null;
+		if(bmd != null && (bmd.component.width == this.sourceSize.x && bmd.component.height == this.sourceSize.y)) {
+			result = bmd;
+			var w = bmd.component.width;
+			var h = bmd.component.height;
+			if(w > this.frame.width || h > this.frame.height) {
+				flixel.system.layer.frames.FlxFrame.RECT.x = flixel.system.layer.frames.FlxFrame.RECT.y = 0;
+				flixel.system.layer.frames.FlxFrame.RECT.width = w;
+				flixel.system.layer.frames.FlxFrame.RECT.height = h;
+				bmd.fillRect(flixel.system.layer.frames.FlxFrame.RECT,0);
+			}
+		} else if(bmd != null) bmd.dispose();
+		if(result == null) result = new flash.display.BitmapData(this.sourceSize.x | 0,this.sourceSize.y | 0,true,0);
+		flixel.system.layer.frames.FlxFrame.POINT.x = this.offset.x;
+		flixel.system.layer.frames.FlxFrame.POINT.y = this.offset.y;
+		result.copyPixels(this._tileSheet.bitmap,this.frame,flixel.system.layer.frames.FlxFrame.POINT);
+		return result;
+	}
 	,getBitmap: function() {
 		if(this._bitmapData != null) return this._bitmapData;
-		this._bitmapData = new flash.display.BitmapData(this.sourceSize.x | 0,this.sourceSize.y | 0,true,0);
-		if(this.rotated) {
-			var temp = new flash.display.BitmapData(this.frame.width | 0,this.frame.height | 0,true,0);
-			flixel.system.layer.frames.FlxFrame.POINT.x = flixel.system.layer.frames.FlxFrame.POINT.y = 0;
-			temp.copyPixels(this._tileSheet.bitmap,this.frame,flixel.system.layer.frames.FlxFrame.POINT);
-			flixel.system.layer.frames.FlxFrame.MATRIX.identity();
-			flixel.system.layer.frames.FlxFrame.MATRIX.translate(-0.5 * this.frame.width,-0.5 * this.frame.height);
-			flixel.system.layer.frames.FlxFrame.MATRIX.rotate(-90. * (Math.PI / 180));
-			flixel.system.layer.frames.FlxFrame.MATRIX.translate(this.offset.x + 0.5 * this.frame.height,this.offset.y + 0.5 * this.frame.width);
-			this._bitmapData.draw(temp,flixel.system.layer.frames.FlxFrame.MATRIX);
-			temp.dispose();
-		} else {
-			flixel.system.layer.frames.FlxFrame.POINT.x = this.offset.x;
-			flixel.system.layer.frames.FlxFrame.POINT.y = this.offset.y;
-			this._bitmapData.copyPixels(this._tileSheet.bitmap,this.frame,flixel.system.layer.frames.FlxFrame.POINT);
-		}
+		this._bitmapData = this.paintOnBitmap();
 		return this._bitmapData;
 	}
 	,getHReversedBitmap: function() {
@@ -14549,6 +14672,32 @@ flixel.system.layer.frames.FlxFrame.prototype = {
 	}
 	,__class__: flixel.system.layer.frames.FlxFrame
 };
+flixel.system.layer.frames.FlxRotatedFrame = function(tileSheet) {
+	flixel.system.layer.frames.FlxFrame.call(this,tileSheet);
+	this.type = flixel.system.layer.frames.FrameType.ROTATED;
+};
+$hxClasses["flixel.system.layer.frames.FlxRotatedFrame"] = flixel.system.layer.frames.FlxRotatedFrame;
+flixel.system.layer.frames.FlxRotatedFrame.__name__ = ["flixel","system","layer","frames","FlxRotatedFrame"];
+flixel.system.layer.frames.FlxRotatedFrame.__super__ = flixel.system.layer.frames.FlxFrame;
+flixel.system.layer.frames.FlxRotatedFrame.prototype = $extend(flixel.system.layer.frames.FlxFrame.prototype,{
+	paintOnBitmap: function(bmd) {
+		var result = null;
+		if(bmd != null && (bmd.component.width == this.sourceSize.x && bmd.component.height == this.sourceSize.y)) result = bmd; else if(bmd != null) bmd.dispose();
+		if(result == null) result = new flash.display.BitmapData(this.sourceSize.x | 0,this.sourceSize.y | 0,true,0);
+		var temp = new flash.display.BitmapData(this.frame.width | 0,this.frame.height | 0,true,0);
+		flixel.system.layer.frames.FlxFrame.POINT.x = flixel.system.layer.frames.FlxFrame.POINT.y = 0;
+		temp.copyPixels(this._tileSheet.bitmap,this.frame,flixel.system.layer.frames.FlxFrame.POINT);
+		flixel.system.layer.frames.FlxFrame.MATRIX.identity();
+		flixel.system.layer.frames.FlxFrame.MATRIX.translate(-0.5 * this.frame.width,-0.5 * this.frame.height);
+		flixel.system.layer.frames.FlxFrame.MATRIX.rotate(-90. * (Math.PI / 180));
+		flixel.system.layer.frames.FlxFrame.MATRIX.translate(this.offset.x + 0.5 * this.frame.height,this.offset.y + 0.5 * this.frame.width);
+		result = new flash.display.BitmapData(this.sourceSize.x | 0,this.sourceSize.y | 0,true,0);
+		result.draw(temp,flixel.system.layer.frames.FlxFrame.MATRIX);
+		temp.dispose();
+		return result;
+	}
+	,__class__: flixel.system.layer.frames.FlxRotatedFrame
+});
 flixel.system.layer.frames.FlxSpriteFrames = function(name) {
 	this.name = name;
 	this.frames = [];
@@ -14572,6 +14721,13 @@ flixel.system.layer.frames.FlxSpriteFrames.prototype = {
 	}
 	,__class__: flixel.system.layer.frames.FlxSpriteFrames
 };
+flixel.system.layer.frames.FrameType = $hxClasses["flixel.system.layer.frames.FrameType"] = { __ename__ : ["flixel","system","layer","frames","FrameType"], __constructs__ : ["REGULAR","ROTATED"] };
+flixel.system.layer.frames.FrameType.REGULAR = ["REGULAR",0];
+flixel.system.layer.frames.FrameType.REGULAR.toString = $estr;
+flixel.system.layer.frames.FrameType.REGULAR.__enum__ = flixel.system.layer.frames.FrameType;
+flixel.system.layer.frames.FrameType.ROTATED = ["ROTATED",1];
+flixel.system.layer.frames.FrameType.ROTATED.toString = $estr;
+flixel.system.layer.frames.FrameType.ROTATED.__enum__ = flixel.system.layer.frames.FrameType;
 flixel.system.replay = {};
 flixel.system.replay.CodeValuePair = function(Code,Value) {
 	if(Value == null) Value = 0;
@@ -16494,10 +16650,9 @@ flixel.tile.FlxTilemap.prototype = $extend(flixel.FlxObject.prototype,{
 				rx = lx + stepX * ((q - ly) / stepY);
 				ry = q;
 				if(rx > tileX && rx < tileX + this._scaledTileWidth) {
-					if(Result != null) {
-						Result.set_x(rx);
-						Result.set_y(ry);
-					}
+					if(Result == null) Result = flixel.util.FlxPoint.get(null,null);
+					Result.set_x(rx);
+					Result.set_y(ry);
 					return false;
 				}
 				return true;
@@ -17790,7 +17945,7 @@ flixel.util.FlxArrayUtil = function() { };
 $hxClasses["flixel.util.FlxArrayUtil"] = flixel.util.FlxArrayUtil;
 flixel.util.FlxArrayUtil.__name__ = ["flixel","util","FlxArrayUtil"];
 flixel.util.FlxArrayUtil.fastSplice_flixel_text_FlxTextFormat = function(array,element) {
-	var index = flixel.util.FlxArrayUtil.indexOf_fastSplice_T(array,element);
+	var index = HxOverrides.indexOf(array,element,0);
 	if(index != -1) {
 		array[index] = array[array.length - 1];
 		array.pop();
@@ -17846,20 +18001,6 @@ flixel.util.FlxArrayUtil.setLength_flixel_input_keyboard_FlxKey = function(array
 		}
 	}
 };
-flixel.util.FlxArrayUtil.indexOf_String = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
-};
 flixel.util.FlxArrayUtil.clearArray_flixel_group_FlxTypedGroup_T = function(array,recursive) {
 	if(recursive == null) recursive = false;
 	if(array != null) {
@@ -17873,20 +18014,6 @@ flixel.util.FlxArrayUtil.getRandom_flixel_group_FlxTypedGroup_T = function(Objec
 	if(EndIndex == null) EndIndex = 0;
 	if(StartIndex == null) StartIndex = 0;
 	return flixel.util.FlxRandom.getObject_getRandom_T(Objects,StartIndex,EndIndex);
-};
-flixel.util.FlxArrayUtil.indexOf_flixel_group_FlxTypedGroup_T = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
 };
 flixel.util.FlxArrayUtil.setLength_Int = function(array,newLength) {
 	if(newLength < 0) return;
@@ -17915,7 +18042,7 @@ flixel.util.FlxArrayUtil.setLength_flash_geom_Rectangle = function(array,newLeng
 	}
 };
 flixel.util.FlxArrayUtil.fastSplice_flixel_tweens_FlxTween = function(array,element) {
-	var index = flixel.util.FlxArrayUtil.indexOf_fastSplice_T(array,element);
+	var index = HxOverrides.indexOf(array,element,0);
 	if(index != -1) {
 		array[index] = array[array.length - 1];
 		array.pop();
@@ -17933,7 +18060,7 @@ flixel.util.FlxArrayUtil.clearArray_flixel_util_FlxTimer = function(array,recurs
 	}
 };
 flixel.util.FlxArrayUtil.fastSplice_flixel_util_FlxTimer = function(array,element) {
-	var index = flixel.util.FlxArrayUtil.indexOf_fastSplice_T(array,element);
+	var index = HxOverrides.indexOf(array,element,0);
 	if(index != -1) {
 		array[index] = array[array.length - 1];
 		array.pop();
@@ -17950,22 +18077,8 @@ flixel.util.FlxArrayUtil.clearArray_flixel_util_FlxPath = function(array,recursi
 		}
 	}
 };
-flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPoint = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
-};
 flixel.util.FlxArrayUtil.fastSplice_flixel_util_FlxPath = function(array,element) {
-	var index = flixel.util.FlxArrayUtil.indexOf_fastSplice_T(array,element);
+	var index = HxOverrides.indexOf(array,element,0);
 	if(index != -1) {
 		array[index] = array[array.length - 1];
 		array.pop();
@@ -17973,101 +18086,208 @@ flixel.util.FlxArrayUtil.fastSplice_flixel_util_FlxPath = function(array,element
 	}
 	return array;
 };
-flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPath = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
-};
-flixel.util.FlxArrayUtil.indexOf_flixel_system_layer_frames_FlxFrame = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
-};
-flixel.util.FlxArrayUtil.indexOf_Float = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
-};
-flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPool_T = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
-		}
-	}
-	return index;
-};
 flixel.util.FlxArrayUtil.swapAndPop_fastSplice_T = function(array,index) {
 	array[index] = array[array.length - 1];
 	array.pop();
 	return array;
 };
-flixel.util.FlxArrayUtil.indexOf_fastSplice_T = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
+flixel.util.FlxBitmapDataPool = function() { };
+$hxClasses["flixel.util.FlxBitmapDataPool"] = flixel.util.FlxBitmapDataPool;
+flixel.util.FlxBitmapDataPool.__name__ = ["flixel","util","FlxBitmapDataPool"];
+flixel.util.FlxBitmapDataPool.__properties__ = {set_maxLength:"set_maxLength"}
+flixel.util.FlxBitmapDataPool.get = function(w,h,transparent,fillColor,exactSize) {
+	if(exactSize == null) exactSize = false;
+	if(transparent == null) transparent = true;
+	var res = null;
+	var node = flixel.util.FlxBitmapDataPool._head;
+	while(node != null) {
+		var bmd = node.bmd;
+		if(bmd.qTransparent == transparent && bmd.component.width >= w && bmd.component.height >= h && (!exactSize || exactSize && bmd.component.width == w && bmd.component.height == h)) {
+			res = bmd;
+			if(node.prev != null) node.prev.next = node.next;
+			if(node.next != null) node.next.prev = node.prev;
+			if(node == flixel.util.FlxBitmapDataPool._head) flixel.util.FlxBitmapDataPool._head = node.next;
+			if(node == flixel.util.FlxBitmapDataPool._tail) flixel.util.FlxBitmapDataPool._tail = node.prev;
+			node = null;
+			flixel.util.FlxBitmapDataPool.$length--;
 			break;
 		}
+		node = node.next;
 	}
-	return index;
+	if(res != null) {
+		if(fillColor != null) {
+			flixel.util.FlxBitmapDataPool._rect.x = 0;
+			flixel.util.FlxBitmapDataPool._rect.y = 0;
+			flixel.util.FlxBitmapDataPool._rect.width = w;
+			flixel.util.FlxBitmapDataPool._rect.height = h;
+			res.fillRect(flixel.util.FlxBitmapDataPool._rect,fillColor);
+		}
+	} else res = new flash.display.BitmapData(w,h,transparent,fillColor != null?fillColor:-1);
+	return res;
 };
-flixel.util.FlxArrayUtil.indexOf_Int = function(array,whatToFind,fromIndex) {
-	if(fromIndex == null) fromIndex = 0;
-	var index = -1;
-	var len = array.length;
-	var _g = fromIndex;
-	while(_g < len) {
-		var i = _g++;
-		if(array[i] == whatToFind) {
-			index = i;
-			break;
+flixel.util.FlxBitmapDataPool.put = function(bmd) {
+	if(flixel.util.FlxBitmapDataPool.$length >= flixel.util.FlxBitmapDataPool.maxLength) {
+		var last = flixel.util.FlxBitmapDataPool._tail;
+		last.bmd.dispose();
+		if(last.prev != null) {
+			last.prev.next = null;
+			flixel.util.FlxBitmapDataPool._tail = last.prev;
+		}
+		last = null;
+		flixel.util.FlxBitmapDataPool.$length--;
+	}
+	var node = new flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode(bmd);
+	node.next = flixel.util.FlxBitmapDataPool._head;
+	if(flixel.util.FlxBitmapDataPool._head == null) flixel.util.FlxBitmapDataPool._head = flixel.util.FlxBitmapDataPool._tail = node; else {
+		flixel.util.FlxBitmapDataPool._head = node;
+		node.next.prev = node;
+	}
+	flixel.util.FlxBitmapDataPool.$length++;
+};
+flixel.util.FlxBitmapDataPool.clear = function() {
+	var node = flixel.util.FlxBitmapDataPool._head;
+	while(node != null) {
+		var bmd = node.bmd;
+		bmd.dispose();
+		bmd = null;
+		node = node.next;
+	}
+	flixel.util.FlxBitmapDataPool.$length = 0;
+	flixel.util.FlxBitmapDataPool._head = flixel.util.FlxBitmapDataPool._tail = null;
+};
+flixel.util.FlxBitmapDataPool.set_maxLength = function(value) {
+	if(flixel.util.FlxBitmapDataPool.maxLength != value) {
+		var node = flixel.util.FlxBitmapDataPool._tail;
+		while(node != null && flixel.util.FlxBitmapDataPool.$length > value) {
+			var bmd = node.bmd;
+			bmd.dispose();
+			bmd = null;
+			node = node.prev;
+			flixel.util.FlxBitmapDataPool.$length--;
 		}
 	}
-	return index;
+	return flixel.util.FlxBitmapDataPool.maxLength = value;
+};
+flixel.util._FlxBitmapDataPool = {};
+flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode = function(bmd,prev,next) {
+	this.bmd = bmd;
+	this.prev = prev;
+	this.next = next;
+};
+$hxClasses["flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode"] = flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode;
+flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode.__name__ = ["flixel","util","_FlxBitmapDataPool","FlxBitmapDataPoolNode"];
+flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode.prototype = {
+	bmd: null
+	,prev: null
+	,next: null
+	,__class__: flixel.util._FlxBitmapDataPool.FlxBitmapDataPoolNode
 };
 flixel.util.FlxCollision = function() { };
 $hxClasses["flixel.util.FlxCollision"] = flixel.util.FlxCollision;
 flixel.util.FlxCollision.__name__ = ["flixel","util","FlxCollision"];
 flixel.util.FlxCollision.pixelPerfectCheck = function(Contact,Target,AlphaTolerance,Camera) {
 	if(AlphaTolerance == null) AlphaTolerance = 1;
-	return false;
+	var considerRotation = Contact.angle != 0 || Target.angle != 0;
+	if(Camera != null) Camera = Camera; else Camera = flixel.FlxG.camera;
+	flixel.util.FlxCollision.pointA.x = Contact.x - (Camera.scroll.x * Contact.scrollFactor.x | 0) - Contact.offset.x;
+	flixel.util.FlxCollision.pointA.y = Contact.y - (Camera.scroll.y * Contact.scrollFactor.y | 0) - Contact.offset.y;
+	flixel.util.FlxCollision.pointB.x = Target.x - (Camera.scroll.x * Target.scrollFactor.x | 0) - Target.offset.x;
+	flixel.util.FlxCollision.pointB.y = Target.y - (Camera.scroll.y * Target.scrollFactor.y | 0) - Target.offset.y;
+	if(considerRotation) {
+		flixel.util.FlxCollision.centerA.setTo(Contact.origin.x,Contact.origin.y);
+		flixel.util.FlxCollision.centerB.setTo(Target.origin.x,Target.origin.y);
+		flixel.util.FlxCollision.boundsA.x = flixel.util.FlxCollision.pointA.x + flixel.util.FlxCollision.centerA.x - flixel.util.FlxCollision.centerA.get_length();
+		flixel.util.FlxCollision.boundsA.y = flixel.util.FlxCollision.pointA.y + flixel.util.FlxCollision.centerA.y - flixel.util.FlxCollision.centerA.get_length();
+		flixel.util.FlxCollision.boundsA.width = flixel.util.FlxCollision.centerA.get_length() * 2;
+		flixel.util.FlxCollision.boundsA.height = flixel.util.FlxCollision.boundsA.width;
+		flixel.util.FlxCollision.boundsB.x = flixel.util.FlxCollision.pointB.x + flixel.util.FlxCollision.centerB.x - flixel.util.FlxCollision.centerB.get_length();
+		flixel.util.FlxCollision.boundsB.y = flixel.util.FlxCollision.pointB.y + flixel.util.FlxCollision.centerB.y - flixel.util.FlxCollision.centerB.get_length();
+		flixel.util.FlxCollision.boundsB.width = flixel.util.FlxCollision.centerB.get_length() * 2;
+		flixel.util.FlxCollision.boundsB.height = flixel.util.FlxCollision.boundsB.width;
+	} else {
+		flixel.util.FlxCollision.boundsA.x = flixel.util.FlxCollision.pointA.x;
+		flixel.util.FlxCollision.boundsA.y = flixel.util.FlxCollision.pointA.y;
+		flixel.util.FlxCollision.boundsA.width = Contact.frameWidth;
+		flixel.util.FlxCollision.boundsA.height = Contact.frameHeight;
+		flixel.util.FlxCollision.boundsB.x = flixel.util.FlxCollision.pointB.x;
+		flixel.util.FlxCollision.boundsB.y = flixel.util.FlxCollision.pointB.y;
+		flixel.util.FlxCollision.boundsB.width = Target.frameWidth;
+		flixel.util.FlxCollision.boundsB.height = Target.frameHeight;
+	}
+	var intersect = flixel.util.FlxCollision.boundsA.intersection(flixel.util.FlxCollision.boundsB);
+	if(intersect.isEmpty() || intersect.width < 1 || intersect.height < 1) return false;
+	flixel.util.FlxCollision.matrixA.identity();
+	flixel.util.FlxCollision.matrixA.translate(-(intersect.x - flixel.util.FlxCollision.boundsA.x),-(intersect.y - flixel.util.FlxCollision.boundsA.y));
+	flixel.util.FlxCollision.matrixB.identity();
+	flixel.util.FlxCollision.matrixB.translate(-(intersect.x - flixel.util.FlxCollision.boundsB.x),-(intersect.y - flixel.util.FlxCollision.boundsB.y));
+	var testA = Contact.framePixels;
+	var testB = Target.framePixels;
+	var overlapWidth = intersect.width | 0;
+	var overlapHeight = intersect.height | 0;
+	if(considerRotation) {
+		flixel.util.FlxCollision.testMatrix.identity();
+		flixel.util.FlxCollision.testMatrix.translate(-Contact.origin.x,-Contact.origin.y);
+		flixel.util.FlxCollision.testMatrix.rotate(Contact.angle * (Math.PI / 180));
+		flixel.util.FlxCollision.testMatrix.translate(flixel.util.FlxCollision.boundsA.width / 2,flixel.util.FlxCollision.boundsA.height / 2);
+		var testA2 = flixel.util.FlxBitmapDataPool.get(Math.floor(flixel.util.FlxCollision.boundsA.width),Math.floor(flixel.util.FlxCollision.boundsA.height),true,0,false);
+		testA2.draw(testA,flixel.util.FlxCollision.testMatrix,null,null,null,false);
+		testA = testA2;
+		flixel.util.FlxCollision.testMatrix.identity();
+		flixel.util.FlxCollision.testMatrix.translate(-Target.origin.x,-Target.origin.y);
+		flixel.util.FlxCollision.testMatrix.rotate(Target.angle * (Math.PI / 180));
+		flixel.util.FlxCollision.testMatrix.translate(flixel.util.FlxCollision.boundsB.width / 2,flixel.util.FlxCollision.boundsB.height / 2);
+		var testB2 = flixel.util.FlxBitmapDataPool.get(Math.floor(flixel.util.FlxCollision.boundsB.width),Math.floor(flixel.util.FlxCollision.boundsB.height),true,0,false);
+		testB2.draw(testB,flixel.util.FlxCollision.testMatrix,null,null,null,false);
+		testB = testB2;
+	}
+	flixel.util.FlxCollision.boundsA.x = -flixel.util.FlxCollision.matrixA.tx | 0;
+	flixel.util.FlxCollision.boundsA.y = -flixel.util.FlxCollision.matrixA.ty | 0;
+	flixel.util.FlxCollision.boundsA.width = overlapWidth;
+	flixel.util.FlxCollision.boundsA.height = overlapHeight;
+	flixel.util.FlxCollision.boundsB.x = -flixel.util.FlxCollision.matrixB.tx | 0;
+	flixel.util.FlxCollision.boundsB.y = -flixel.util.FlxCollision.matrixB.ty | 0;
+	flixel.util.FlxCollision.boundsB.width = overlapWidth;
+	flixel.util.FlxCollision.boundsB.height = overlapHeight;
+	var pixelsA = testA.getPixels(flixel.util.FlxCollision.boundsA);
+	var pixelsB = testB.getPixels(flixel.util.FlxCollision.boundsB);
+	var hit = false;
+	var alphaA = 0;
+	var alphaB = 0;
+	var overlapPixels = overlapWidth * overlapHeight;
+	var alphaIdx = 0;
+	var _g1 = 0;
+	var _g = Math.ceil(overlapPixels / 2);
+	while(_g1 < _g) {
+		var i = _g1++;
+		alphaIdx = i << 3;
+		pixelsA.position = pixelsB.position = alphaIdx;
+		alphaA = pixelsA.data.getUint8(pixelsA.position++);
+		alphaB = pixelsB.data.getUint8(pixelsB.position++);
+		if(alphaA >= AlphaTolerance && alphaB >= AlphaTolerance) {
+			hit = true;
+			break;
+		}
+	}
+	if(!hit) {
+		var _g11 = 0;
+		var _g2 = overlapPixels >> 1;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			alphaIdx = (i1 << 3) + 4;
+			pixelsA.position = pixelsB.position = alphaIdx;
+			alphaA = pixelsA.data.getUint8(pixelsA.position++);
+			alphaB = pixelsB.data.getUint8(pixelsB.position++);
+			if(alphaA >= AlphaTolerance && alphaB >= AlphaTolerance) {
+				hit = true;
+				break;
+			}
+		}
+	}
+	if(considerRotation) {
+		flixel.util.FlxBitmapDataPool.put(testA);
+		flixel.util.FlxBitmapDataPool.put(testB);
+	}
+	return hit;
 };
 flixel.util.FlxCollision.pixelPerfectPointCheck = function(PointX,PointY,Target,AlphaTolerance) {
 	if(AlphaTolerance == null) AlphaTolerance = 1;
@@ -18350,7 +18570,7 @@ flixel.util.FlxColorUtil.RGBtoHSV = function(Color) {
 		var delta_r = ((max - red) / 6 + delta / 2) / delta;
 		var delta_g = ((max - green) / 6 + delta / 2) / delta;
 		var delta_b = ((max - blue) / 6 + delta / 2) / delta;
-		if(red == max) hue = delta_b - delta_g; else if(green == max) hue = 0.33333333333333331 + delta_r - delta_b; else if(blue == max) hue = 0.66666666666666663 + delta_g - delta_r;
+		if(red == max) hue = delta_b - delta_g; else if(green == max) hue = 0.333333333333333315 + delta_r - delta_b; else if(blue == max) hue = 0.66666666666666663 + delta_g - delta_r;
 		if(hue < 0) hue += 1;
 		if(hue > 1) hue -= 1;
 	}
@@ -18630,7 +18850,7 @@ flixel.util.FlxPool.prototype = {
 		return obj;
 	}
 	,put: function(obj) {
-		if(obj != null && flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPool_T(this._pool,obj) < 0) {
+		if(obj != null && HxOverrides.indexOf(this._pool,obj,0) < 0) {
 			obj.destroy();
 			this._pool.push(obj);
 		}
@@ -18674,7 +18894,7 @@ flixel.util.FlxPool_flixel_util_LabelValuePair.prototype = {
 		return obj;
 	}
 	,put: function(obj) {
-		if(obj != null && flixel.util.FlxArrayUtil.indexOf_flixel_util_FlxPool_T(this._pool,obj) < 0) {
+		if(obj != null && HxOverrides.indexOf(this._pool,obj,0) < 0) {
 			obj.destroy();
 			this._pool.push(obj);
 		}
@@ -18762,7 +18982,7 @@ flixel.util.FlxRandom.intRanged = function(Min,Max,Excludes) {
 			Max = Min - Max;
 			Min = Min - Max;
 		}
-		if(Excludes == null) flixel.util.FlxRandom._intHelper = Math.floor(Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min + 1)); else do flixel.util.FlxRandom._intHelper = Math.floor(Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min + 1)); while(flixel.util.FlxArrayUtil.indexOf_Int(Excludes,flixel.util.FlxRandom._intHelper) >= 0);
+		if(Excludes == null) flixel.util.FlxRandom._intHelper = Math.floor(Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min + 1)); else do flixel.util.FlxRandom._intHelper = Math.floor(Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min + 1)); while(HxOverrides.indexOf(Excludes,flixel.util.FlxRandom._intHelper,0) >= 0);
 	}
 	return flixel.util.FlxRandom._intHelper;
 };
@@ -18775,7 +18995,7 @@ flixel.util.FlxRandom.floatRanged = function(Min,Max,Excludes) {
 			Max = Min - Max;
 			Min = Min - Max;
 		}
-		if(Excludes == null) flixel.util.FlxRandom._floatHelper = Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min); else do flixel.util.FlxRandom._floatHelper = Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min); while(flixel.util.FlxArrayUtil.indexOf_Float(Excludes,flixel.util.FlxRandom._floatHelper) >= 0);
+		if(Excludes == null) flixel.util.FlxRandom._floatHelper = Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min); else do flixel.util.FlxRandom._floatHelper = Min + (flixel.util.FlxRandom._internalSeed = flixel.util.FlxRandom._internalSeed * 48271 % 2147483647 & 2147483647) / 2147483647 * (Max - Min); while(HxOverrides.indexOf(Excludes,flixel.util.FlxRandom._floatHelper,0) >= 0);
 	}
 	return flixel.util.FlxRandom._floatHelper;
 };
@@ -19347,6 +19567,16 @@ flixel.util.FlxStringUtil.formatMoney = function(Amount,ShowDecimal,EnglishStyle
 	}
 	return string;
 };
+flixel.util.FlxStringUtil.formatBytes = function(Bytes,Precision) {
+	if(Precision == null) Precision = 2;
+	var units = ["Bytes","kB","MB","GB","TB","PB"];
+	var curUnit = 0;
+	while(Bytes >= 1024 && curUnit < units.length - 1) {
+		Bytes /= 1024;
+		curUnit++;
+	}
+	return flixel.util.FlxMath.roundDecimal(Bytes,Precision) + units[curUnit];
+};
 flixel.util.FlxStringUtil.filterDigits = function(Input) {
 	var output = new StringBuf();
 	var _g1 = 0;
@@ -19514,7 +19744,7 @@ flixel.util.FlxStringUtil.bitmapToCSV = function(Bitmap,Invert,Scale,ColorMap) {
 		column = 0;
 		while(column < bitmapWidth) {
 			pixel = Bitmap.getPixel(column,row);
-			if(ColorMap != null) pixel = flixel.util.FlxArrayUtil.indexOf_Int(ColorMap,pixel); else if(Invert && pixel > 0 || !Invert && pixel == 0) pixel = 1; else pixel = 0;
+			if(ColorMap != null) pixel = HxOverrides.indexOf(ColorMap,pixel,0); else if(Invert && pixel > 0 || !Invert && pixel == 0) pixel = 1; else pixel = 0;
 			if(column == 0) {
 				if(row == 0) csv += pixel; else csv += "\n" + pixel;
 			} else csv += ", " + pixel;
@@ -19686,7 +19916,7 @@ flixel.util.loaders.CachedGraphics = function(Key,Bitmap,Persist) {
 	if(Persist == null) Persist = false;
 	this.useCount = 0;
 	this.isDumped = false;
-	this.destroyOnNoUse = false;
+	this.destroyOnNoUse = true;
 	this.persist = false;
 	this.key = Key;
 	this.bitmap = Bitmap;
@@ -21048,7 +21278,6 @@ states.PlayState = function(MaxSize) {
 	this.MAX_SPEED = 250;
 	this.canVariableJump = true;
 	this.canDoubleJump = true;
-	this.onTheGround = true;
 	this.timerStarted = false;
 	flixel.FlxState.call(this,MaxSize);
 };
@@ -21060,7 +21289,6 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 	,ground: null
 	,variableJumpTimer: null
 	,timerStarted: null
-	,onTheGround: null
 	,canDoubleJump: null
 	,canVariableJump: null
 	,MAX_SPEED: null
@@ -21079,6 +21307,7 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 		this.player.maxVelocity.set_x(this.MAX_SPEED);
 		this.player.maxVelocity.set_y(this.MAX_SPEED * 10);
 		this.player.drag.set_x(this.DRAG);
+		this.player.acceleration.set_y(this.GRAVITY);
 		this.variableJumpTimer = new flixel.util.FlxTimer();
 		this.ground = new flixel.group.FlxGroup();
 		var _g1 = 0;
@@ -21113,14 +21342,17 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 		flixel.FlxState.prototype.destroy.call(this);
 	}
 	,update: function() {
-		flixel.FlxState.prototype.update.call(this);
+		var onTheGround = (this.player.touching & 4096) > 0;
 		if(flixel.FlxG.keys.checkKeyStatus(["LEFT"],1)) this.player.acceleration.set_x(-this.ACCELERATION); else if(flixel.FlxG.keys.checkKeyStatus(["RIGHT"],1)) this.player.acceleration.set_x(this.ACCELERATION); else this.player.acceleration.set_x(0);
+		if(onTheGround) {
+			this.canDoubleJump = true;
+			this.canVariableJump = true;
+		}
 		if(flixel.FlxG.keys.checkKeyStatus(["UP"],2)) {
 			if(this.canDoubleJump && !this.timerStarted) this.canVariableJump = true;
-			if(this.canDoubleJump || this.onTheGround) {
+			if(this.canDoubleJump || onTheGround) {
 				this.player.velocity.set_y(this.JUMP_SPEED);
-				if(!this.onTheGround) this.canDoubleJump = false;
-				this.onTheGround = false;
+				if(!onTheGround) this.canDoubleJump = false;
 			}
 		}
 		if(this.canVariableJump && flixel.FlxG.keys.checkKeyStatus(["UP"],1)) {
@@ -21129,22 +21361,14 @@ states.PlayState.prototype = $extend(flixel.FlxState.prototype,{
 				this.timerStarted = true;
 			}
 			this.player.velocity.set_y(this.JUMP_SPEED);
-			this.onTheGround = false;
 		}
 		if(!flixel.FlxG.keys.checkKeyStatus(["UP"],1)) this.canVariableJump = false;
-		if(!this.onTheGround) this.player.acceleration.set_y(this.GRAVITY);
-		flixel.FlxG.overlap(this.player,this.ground,$bind(this,this.onGround),flixel.FlxObject.separate);
-	}
-	,onGround: function(player,groundBlock) {
-		this.onTheGround = true;
-		this.canDoubleJump = true;
-		this.canVariableJump = true;
-		player.acceleration.set_y(0);
+		flixel.FlxState.prototype.update.call(this);
+		flixel.FlxG.overlap(this.player,this.ground,null,flixel.FlxObject.separate);
 	}
 	,onVariableJumpEnds: function(timer) {
 		this.canVariableJump = false;
 		this.timerStarted = false;
-		haxe.Log.trace("timer done",{ fileName : "PlayState.hx", lineNumber : 184, className : "states.PlayState", methodName : "onVariableJumpEnds"});
 	}
 	,__class__: states.PlayState
 });
@@ -21262,7 +21486,7 @@ flixel.FlxG.autoPause = true;
 flixel.FlxG.fixedTimestep = true;
 flixel.FlxG.timeScale = 1;
 flixel.FlxG.worldDivisions = 6;
-flixel.FlxG.VERSION = new flixel.system.FlxVersion(3,3,1);
+flixel.FlxG.VERSION = new flixel.system.FlxVersion(3,3,2);
 flixel.FlxG.elapsed = 0;
 flixel.FlxG.maxElapsed = 0.1;
 flixel.FlxG.fullscreen = false;
@@ -21273,6 +21497,7 @@ flixel.FlxG.html5 = new flixel.system.frontEnds.HTML5FrontEnd();
 flixel.FlxG.inputs = new flixel.system.frontEnds.InputFrontEnd();
 flixel.FlxG.console = new flixel.system.frontEnds.ConsoleFrontEnd();
 flixel.FlxG.log = new flixel.system.frontEnds.LogFrontEnd();
+flixel.FlxG.bitmapLog = new flixel.system.frontEnds.BitmapLogFrontEnd();
 flixel.FlxG.watch = new flixel.system.frontEnds.WatchFrontEnd();
 flixel.FlxG["debugger"] = new flixel.system.frontEnds.DebuggerFrontEnd();
 flixel.FlxG.vcr = new flixel.system.frontEnds.VCRFrontEnd();
@@ -21374,6 +21599,7 @@ flixel.input.keyboard.FlxKey.DOWN = 40;
 flixel.input.keyboard.FlxKey.LEFT = 37;
 flixel.input.keyboard.FlxKey.RIGHT = 39;
 flixel.input.keyboard.FlxKey.TAB = 9;
+flixel.input.keyboard.FlxKey.PRINTSCREEN = 301;
 flixel.input.keyboard.FlxKey.F1 = 112;
 flixel.input.keyboard.FlxKey.F2 = 113;
 flixel.input.keyboard.FlxKey.F3 = 114;
@@ -21434,6 +21660,7 @@ flixel.system.debug.Window.WINDOW_AMOUNT = 0;
 flixel.system.layer.TileSheetExt._DRAWCALLS = 0;
 flixel.system.layer.frames.FlxFrame.POINT = new flash.geom.Point();
 flixel.system.layer.frames.FlxFrame.MATRIX = new flash.geom.Matrix();
+flixel.system.layer.frames.FlxFrame.RECT = new flash.geom.Rectangle();
 flixel.text.FlxText.BORDER_NONE = 0;
 flixel.text.FlxText.BORDER_SHADOW = 1;
 flixel.text.FlxText.BORDER_OUTLINE = 2;
@@ -21446,16 +21673,19 @@ flixel.tile.FlxTilemap.ALT = 2;
 flixel.tile.FlxTilemap._helperBuffer = Type.createEmptyInstance(flixel.tile.FlxTilemapBuffer);
 flixel.tweens.FlxEase.PI2 = Math.PI / 2;
 flixel.tweens.FlxEase.EL = 2 * Math.PI / .45;
-flixel.tweens.FlxEase.B1 = 0.36363636363636365;
-flixel.tweens.FlxEase.B2 = 0.72727272727272729;
-flixel.tweens.FlxEase.B3 = 0.54545454545454541;
-flixel.tweens.FlxEase.B4 = 0.90909090909090906;
-flixel.tweens.FlxEase.B5 = 0.81818181818181823;
-flixel.tweens.FlxEase.B6 = 0.95454545454545459;
+flixel.tweens.FlxEase.B1 = 0.363636363636363646;
+flixel.tweens.FlxEase.B2 = 0.727272727272727293;
+flixel.tweens.FlxEase.B3 = 0.545454545454545414;
+flixel.tweens.FlxEase.B4 = 0.909090909090909061;
+flixel.tweens.FlxEase.B5 = 0.818181818181818232;
+flixel.tweens.FlxEase.B6 = 0.954545454545454586;
 flixel.tweens.FlxEase.ELASTIC_AMPLITUDE = 1;
 flixel.tweens.FlxEase.ELASTIC_PERIOD = 0.4;
 flixel.util.FlxAngle.cosTable = new Array();
 flixel.util.FlxAngle.sinTable = new Array();
+flixel.util.FlxBitmapDataPool.maxLength = 8;
+flixel.util.FlxBitmapDataPool.$length = 0;
+flixel.util.FlxBitmapDataPool._rect = new flash.geom.Rectangle();
 flixel.util.FlxCollision.CAMERA_WALL_OUTSIDE = 0;
 flixel.util.FlxCollision.CAMERA_WALL_INSIDE = 1;
 flixel.util.FlxCollision.pointA = new flash.geom.Point();
