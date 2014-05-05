@@ -25,6 +25,8 @@ class PlayState extends FlxState {
 	public override function create():Void {
 		super.create();
 		
+		FlxG.mouse.visible = false;
+		
 		// Set stage background to something sky colored
 		FlxG.cameras.bgColor = 0xFF4488CC; // ARGB
 		
