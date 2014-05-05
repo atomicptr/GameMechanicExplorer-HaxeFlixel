@@ -1,4 +1,6 @@
 bin/*
+bin/flash
+bin/mac64
 *.db
 
 !bin/html5
