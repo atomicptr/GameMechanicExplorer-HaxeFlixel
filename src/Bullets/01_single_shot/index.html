@@ -1,6 +1,21 @@
 <!doctype html>
 <title>Game Mechanic Explorer</title>
 
+<!-- settings -->
+<script>
+	EXAMPLE_NAME = "Single shot";
+	EXAMPLE_NOTES = "Click or tap to fire a bullet.<br/>" +
+		"<br/>Here we fire a single bullet and only a single bullet may be on screen at any time. " +
+		"This example also shows how to use an object pool to recycle bullet objects. Recycling " +
+		"objects in this way is essential for good performance. Because there is only one bullet " +
+		"in this pool, only one bullet can appear at any given time.";
+
+	BACK_TEXT = "Bullets";
+	BACK_LINK = "..";
+
+	PLAY_STATE_PATH = "src/states/PlayState.hx";
+</script>
+
 <!-- meta stuff -->
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -33,6 +48,7 @@
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
+				<li class="active"><a id="back-link" href="#"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">...</span></a></li>
 				<li><a href="/web/pages/about.html">About</a></li>
 				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
 			</ul>
@@ -42,45 +58,22 @@
 
 <div class="jumbotron">
 	<div class="container">
-		<h1 id="example-title">Game Mechanic Explorer</h1>
-		<p class="lead">
-			A collection of concrete examples for various <a href="http://www.lostgarden.com/2006/10/what-are-game-mechanics.html">game mechanics</a>, algorithms,
-			and effects. The examples are all implemented in <a href="http://haxe.org">Haxe</a> using the <a href="http://haxeflixel.com">HaxeFlixel</a> game framework,
-			but the concepts and methods are general and can be adapted to any engine. Think of it as pseudocode. Each section contains several different examples that
-			progress in sequence from a very basic implementation to a more advanced implementation.<br/>
-			<br/>
-			Select one of the examples below!
-		</p>
+		<h1 id="example-title"></h1>
 	</div>
 </div>
 
 <div class="container content-container">
-	<div class="list-group">
-		<!-- Mechanics -->
-		<a class="list-group-item list-group-item-info list-group-menu-hover-hack">
-			<h4 class="list-group-item-heading">Mechanics</h4>
-		</a>
-		<a class="list-group-item" href="WalkingAndJumping/">
-			<h4 class="list-group-item-heading">Walking and jumping</h4>
-			<p class="list-group-item-text">In this set of examples we'll look at the components of platformer-style movement.</p>
-		</a>
-		<a class="list-group-item" href="Bullets/">
-			<h4 class="list-group-item-heading">Bullets</h4>
-			<p class="list-group-item-text">Bullets! Peng! Peng!</p>
-		</a>
-		<a class="list-group-item list-group-stupid-thing">
-			<h4 class="list-group-item-heading">More examples coming soon...</h4>
-			<p class="list-group-item-text">When? When it's done! I don't have too much time ;). You're always welcome to contribute some though.</p>
-		</a>
+	<div class="game-container">
+		<iframe frameBorder=0 width=800 height=480 src="bin/html5/bin/index.html"></iframe>
+	</div>
 
-		<!-- Effects -->
-		<a class="list-group-item list-group-item-info list-group-menu-hover-hack">
-			<h4 class="list-group-item-heading">Effects</h4>
-		</a>
-		<a class="list-group-item list-group-stupid-thing">
-			<h4 class="list-group-item-heading">More examples coming soon...</h4>
-			<p class="list-group-item-text">When? When it's done! I don't have too much time ;). You're always welcome to contribute some though.</p>
-		</a>
+	<h2>Notes</h2>
+	<p id="example-notes" class="lead">
+	</p>
+
+	<h2>Source</h2>
+	<div class="code-container">
+		<pre class="sh_haxe" id="code-example"></pre>
 	</div>
 </div>
 
@@ -90,6 +83,9 @@
 
 <!-- scripts -->
 <script src="/web/lib/jquery.js"></script>
+<script src="/web/lib/shjs/sh_main.min.js"></script>
+<script src="/web/lib/shjs/sh_haxe.min.js"></script>
+<script src="/web/scripts/main.js"></script>
 
 <!-- analytics -->
 <script>
