@@ -1,6 +1,3 @@
-bin/*
-bin/flash
-bin/mac64
+bin
 *.db
 
-!bin/html5
