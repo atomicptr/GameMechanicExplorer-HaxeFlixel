@@ -1,5 +1,2 @@
-build: clean
-	lime build html5
-
-clean:
-	rm -rf bin
+build:
+	lime build html5 -minify -yui
