@@ -1,5 +1,5 @@
 <!doctype html>
-<title>About - Game Mechanic Explorer</title>
+<title>{{ page.title }}</title>
 
 <!-- meta stuff -->
 <meta charset="utf-8">
@@ -33,35 +33,17 @@
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li><a id="back-link" href="/"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">"Examples selection"</span></a></li>
-				<li class="active"><a href="/web/pages/about.html">About</a></li>
+				{% if page.use_back %}
+					<li><a id="back-link" href="{{ page.back_link }}"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">"{{ page.back_text }}"</span></a></li>
+				{% endif %}
+				<li class="active"><a href="/about.html">About</a></li>
 				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div>
 </div>
 
-<div class="jumbotron">
-	<div class="container">
-		<h1 id="example-title">About</h1>
-	</div>
-</div>
-
-<div class="container content-container">
-	This site is a HaxeFlixel port of <a href="http://gamemechanicexplorer.com">John Watsons: Game Mechanic Explorer</a> which was written for the JavaScript game framework Phaser.<br/><br/>
-	
-	<div style="text-align: center; margin-bottom: 30px;">
-		<img src="/web/images/welcome.png" />
-	</div>
-	
-	<h2>Purpose?</h2>
-	
-	The purpose of this site is obviously to push the awesome <a href="http://haxeflixel.com">HaxeFlixel framework</a> ;).
-	
-	<h2>How to contribute?</h2>
-	
-	If you want to contribute more awesome tutorials you can press the "Github" button at the top and fork the project!
-</div>
+{{ content }}
 
 <div class="footer">
 	Haxe Port, Copyright &copy; <a href="https://twitter.com/kasoki">Christopher Kaster</a> 2014. Assets and initial project, Copyright &copy; <a href="https://twitter.com/yafd">John Watson</a> 2014.

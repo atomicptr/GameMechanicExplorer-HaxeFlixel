@@ -1,95 +1,10 @@
-<!doctype html>
-<title>Game Mechanic Explorer</title>
+---
+layout: example
+title: Variable jump height
+use_back: true
+back_link: ..
+back_name: Walking and Jumping
+---
 
-<!-- settings -->
-<script>
-	EXAMPLE_NAME = "Variable jump height";
-	EXAMPLE_NOTES = "Use the arrow keys to move the player left and right. Press the up arrow to jump and double jump (while in the air).<br/>" +
-		"<br/>You can control the height of the jump by how long you hold down the jump button.";
-	
-	BACK_TEXT = "Walking and Jumping";
-	BACK_LINK = "..";
-		
-	PLAY_STATE_PATH = "src/states/PlayState.hx";
-</script>
-
-<!-- meta stuff -->
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Game Mechanic Explorer for HaxeFlixel">
-<meta name="author" content="Christopher Kaster">
-<link rel="shortcut icon" href="/web/images/favicon.ico">
-
-<!-- stylesheets -->
-<link type="text/css" rel="stylesheet" href="/web/lib/bootstrap/css/bootstrap.min.css" />
-<link type="text/css" rel="stylesheet" href="/web/styles/style.css" />
-<link type="text/css" rel="stylesheet" href="/web/lib/shjs/sh_style.css" />
-
-<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
-
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-	<div class="container">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-			<span class="sr-only">Toggle navigation</span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="/"><img id="brand-logo" src="/web/images/haxeflixel.svg" /> Game Mechanic Explorer</a>
-		</div>
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li class="active"><a id="back-link" href="#"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">...</span></a></li>
-				<li><a href="/web/pages/about.html">About</a></li>
-				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
-			</ul>
-		</div><!--/.nav-collapse -->
-	</div>
-</div>
-
-<div class="jumbotron">
-	<div class="container">
-		<h1 id="example-title"></h1>
-	</div>
-</div>
-
-<div class="container content-container">
-	<div class="game-container">
-		<iframe frameBorder=0 width=800 height=480 src="bin/html5/bin/index.html"></iframe>
-	</div>
-	
-	<h2>Notes</h2>
-	<p id="example-notes" class="lead">
-	</p>
-	
-	<h2>Source</h2>
-	<div class="code-container">
-		<pre class="sh_haxe" id="code-example"></pre>
-	</div>
-</div>
-
-<div class="footer">
-	Haxe Port, Copyright &copy; <a href="https://twitter.com/kasoki">Christopher Kaster</a> 2014. Assets and initial project, Copyright &copy; <a href="https://twitter.com/yafd">John Watson</a> 2014.
-</div>
-
-<!-- scripts -->
-<script src="/web/lib/jquery.js"></script>
-<script src="/web/lib/shjs/sh_main.min.js"></script>
-<script src="/web/lib/shjs/sh_haxe.min.js"></script>
-<script src="/web/scripts/main.js"></script>
-
-<!-- analytics -->
-<script>
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-50573809-1', 'kasoki.de');
-	ga('send', 'pageview');
-</script>
+Use the arrow keys to move the player left and right. Press the up arrow to jump and double jump (while in the air).<br/>
+<br/>You can control the height of the jump by how long you hold down the jump button.
