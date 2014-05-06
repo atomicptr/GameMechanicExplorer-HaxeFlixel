@@ -43,7 +43,7 @@ class PlayState extends FlxState {
 
 		// create a pool of bullets that we can shoot
 		bulletPool = new FlxTypedGroup<FlxSprite>();
-		
+
 		// fill the bulletPool with the maximum number of bullets that can exist at once
 		for(i in 0...NUMBER_OF_BULLETS) {
 			// create bullet
@@ -77,6 +77,7 @@ class PlayState extends FlxState {
 		// if primary mouse button is pressed and enough time has elapsed since last shot
 		if(FlxG.mouse.pressed && elapsed >= SHOT_DELAY) {
 			shootBullet();
+
 			// reset elapsed
 			elapsed = 0;
 		}
@@ -103,13 +104,13 @@ class PlayState extends FlxState {
 		// mark bullet as alive
 		bullet.revive();
 
-		// Set the bullet position to the gun position.
+		// set the bullet position to the gun position.
 		bullet.reset(gun.x, gun.y);
 
 		// set the bullet angle
 		bullet.angle = FlxAngle.angleBetweenMouse(bullet, true);
 
-		// Shoot in the right direction! Peng!
+		// shoot in the right direction! Peng!
 		bullet.velocity.x = Math.cos(bullet.angle * FlxAngle.TO_RAD) * BULLET_SPEED;
 		bullet.velocity.y = Math.sin(bullet.angle * FlxAngle.TO_RAD) * BULLET_SPEED;
 	}

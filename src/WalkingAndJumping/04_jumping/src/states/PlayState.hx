@@ -28,10 +28,10 @@ class PlayState extends FlxState {
 	// setup the example
 	public override function create():Void {
 		super.create();
-	
+
 		FlxG.mouse.visible = false;
 
-		// Set stage background to something sky colored
+		// set stage background to something sky colored
 		FlxG.cameras.bgColor = 0xFF4488CC; // ARGB
 
 		// create the player
@@ -101,23 +101,23 @@ class PlayState extends FlxState {
 	// update() method is called every frame
 	public override function update():Void {
 		if(FlxG.keys.anyPressed(["LEFT"])) {
-			// If the LEFT key is down, set the players velocity to move left
+			// if the LEFT key is down, set the players velocity to move left
 			player.acceleration.x = -this.ACCELERATION;
 		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
-			// If the RIGHT key is down, set the players velocity to move right
+			// if the RIGHT key is down, set the players velocity to move right
 			player.acceleration.x = this.ACCELERATION;
 		} else {
 			player.acceleration.x = 0;
 		}
 
 		if(player.isTouching(FlxObject.FLOOR) && FlxG.keys.anyPressed(["UP"])) {
-			// Jump when the player is touching the ground an the up arrow is pressed;
+			// jump when the player is touching the ground an the up arrow is pressed;
 			player.velocity.y = this.JUMP_SPEED;
 		}
 
 		super.update();
 
-		// Collide the player with the ground
+		// collide the player with the ground
 		FlxG.collide(player, ground);
 	}
 }
