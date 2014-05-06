@@ -16,8 +16,10 @@ import flixel.util.FlxAngle;
 
 class PlayState extends FlxState {
 
+	// a sprite that represents our gun
 	private var gun:FlxSprite;
 
+	// group that contains the bullets
 	private var bulletPool:FlxTypedGroup<FlxSprite>;
 
 	// variable to track the elapsed time
@@ -32,30 +34,32 @@ class PlayState extends FlxState {
 	public override function create():Void {
 		super.create();
 
-		// Set stage background to something sky colored
+		// set stage background to something sky colored
 		FlxG.cameras.bgColor = 0xFF4488CC; // ARGB
 
-		// Create an object representing our gun
+		// create the gun sprite
 		gun = new FlxSprite(50, FlxG.height / 2);
 		gun.loadGraphic("assets/bullet.png");
 
+		// create a pool of bullets that we can shoot
 		bulletPool = new FlxTypedGroup<FlxSprite>();
-
-		// Create an object pool of bullets
+		
+		// fill the bulletPool with the maximum number of bullets that can exist at once
 		for(i in 0...NUMBER_OF_BULLETS) {
 			// create bullet
-			var bullet = new FlxSprite(this.gun.x, this.gun.y);
+			var bullet = new FlxSprite(gun.x, gun.y);
 			bullet.loadGraphic("assets/bullet.png");
 
 			// add bullet to pool
 			bulletPool.add(bullet);
 
-			// Set its initial state to "dead".
+			// set its initial state to "dead" - it will be revived when it's shot
 			bullet.kill();
 		}
 
-		this.add(gun);
-		this.add(bulletPool);
+		// add gun and bulletPool to this FlxState (this is what causes them to update and draw)
+		add(gun);
+		add(bulletPool);
 	}
 
 	public override function destroy():Void {
@@ -68,16 +72,18 @@ class PlayState extends FlxState {
 		elapsed += FlxG.elapsed;
 
 		// set the gun angle
-		this.gun.angle = FlxAngle.angleBetweenMouse(this.gun, true);
+		gun.angle = FlxAngle.angleBetweenMouse(gun, true);
 
-		// if primary mouse button is pressed
-		if(FlxG.mouse.pressed) {
+		// if primary mouse button is pressed and enough time has elapsed since last shot
+		if(FlxG.mouse.pressed && elapsed >= SHOT_DELAY) {
 			shootBullet();
+			// reset elapsed
+			elapsed = 0;
 		}
 
-		// if a bullet is not on screen, kill it!
+		// if a bullet is alive and not on screen, kill it!
 		for(bullet in bulletPool) {
-			if(!bullet.isOnScreen(FlxG.camera)) {
+			if(bullet.alive && !bullet.isOnScreen(FlxG.camera)) {
 				bullet.kill();
 			}
 		}
@@ -86,14 +92,6 @@ class PlayState extends FlxState {
 	}
 
 	private function shootBullet():Void {
-		// if not enough time is elapsed stop
-		if(elapsed < this.SHOT_DELAY) {
-			return;
-		}
-
-		// reset elapsed
-		elapsed = 0;
-
 		// get a dead bullet from the pool
 		var bullet:FlxSprite = cast bulletPool.getFirstDead();
 
@@ -106,13 +104,13 @@ class PlayState extends FlxState {
 		bullet.revive();
 
 		// Set the bullet position to the gun position.
-		bullet.reset(this.gun.x, this.gun.y);
+		bullet.reset(gun.x, gun.y);
 
 		// set the bullet angle
 		bullet.angle = FlxAngle.angleBetweenMouse(bullet, true);
 
 		// Shoot in the right direction! Peng!
-		bullet.velocity.x = Math.cos(bullet.angle * FlxAngle.TO_RAD) * this.BULLET_SPEED;
-		bullet.velocity.y = Math.sin(bullet.angle * FlxAngle.TO_RAD) * this.BULLET_SPEED;
+		bullet.velocity.x = Math.cos(bullet.angle * FlxAngle.TO_RAD) * BULLET_SPEED;
+		bullet.velocity.y = Math.sin(bullet.angle * FlxAngle.TO_RAD) * BULLET_SPEED;
 	}
 }
