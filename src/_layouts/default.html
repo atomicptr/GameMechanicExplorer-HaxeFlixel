@@ -34,7 +34,7 @@
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
 				{% if page.use_back %}
-					<li><a id="back-link" href="{{ page.back_link }}"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">"{{ page.back_text }}"</span></a></li>
+					<li><a id="back-link" href="{{ page.back_link }}"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">"{{ page.back_name }}"</span></a></li>
 				{% endif %}
 				<li class="active"><a href="/about.html">About</a></li>
 				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
@@ -51,6 +51,12 @@
 
 <!-- scripts -->
 <script src="/web/lib/jquery.js"></script>
+
+{% if page.is_example %}
+	<script src="/web/lib/shjs/sh_main.min.js"></script>
+	<script src="/web/lib/shjs/sh_haxe.min.js"></script>
+	<script src="/web/scripts/main.js"></script>
+{% endif %}
 
 <!-- analytics -->
 <script>
