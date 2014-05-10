@@ -1,0 +1,23 @@
+{
+	"web/pages/about.html": "/about.html",
+	"examples": "/",
+	
+	"WalkingAndJumping": "/examples/walking-and-jumping",
+	"WalkingAndJumping/01_basic_walking": "/examples/walking-and-jumping/basic-walking",
+	"WalkingAndJumping/02_with_acceleration": "/examples/walking-and-jumping/with-acceleration",
+	"WalkingAndJumping/03_with_drag": "/examples/walking-and-jumping/with-drag",
+	"WalkingAndJumping/04_jumping": "/examples/walking-and-jumping/jumping",
+	"WalkingAndJumping/05_double_jump": "/examples/walking-and-jumping/double-jump",
+	"WalkingAndJumping/06_variable_jump_height": "/examples/walking-and-jumping/variable-jump-height",
+	
+	"Bullets": "/examples/bullets",
+	"Bullets/01_single_shot": "/examples/bullets/single-shot",
+	"Bullets/02_rapid_fire": "/examples/bullets/rapid-fire",
+	"Bullets/03_aiming": "/examples/bullets/aiming",
+	"Bullets/04_artillery": "/examples/bullets/artillery",
+	"Bullets/05_display_trajectory": "/examples/bullets/display-trajectory",
+	
+	"SpaceshipMotion": "/examples/spaceship-motion",
+	"SpaceshipMotion/01_basic_movement": "/examples/basic-movement",
+	"SpaceshipMotion/02_with_drag": "/examples/with-drag"
+}
