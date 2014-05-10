@@ -40,6 +40,14 @@ html, body {
 	background-color: white !important;
 }
 
+.btn-back {
+	float: left;
+}
+
+.btn-next {
+	float: right;
+}
+
 #push {
 	overflow: auto;
 	padding-bottom: 120px;

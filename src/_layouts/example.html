@@ -23,4 +23,18 @@ is_example: true
 	<div class="code-container">
 		<pre class="sh_haxe" id="code-example"></pre>
 	</div>
+	
+	<div class="example-nav-box">
+		{% if page.use_back_button %}
+			<a href="{{ page.back_button_link }}">
+				<button class="btn btn-info btn-lg btn-back"><span class="glyphicon glyphicon-chevron-left"></span> Back</button>
+			</a>
+		{% endif %}
+		
+		{% if page.use_next_button %}
+			<a href="{{ page.next_button_link }}">
+				<button class="btn btn-info btn-lg btn-next"><span class="glyphicon glyphicon-chevron-right"></span> Next</button>
+			</a>
+		{% endif %}
+	</div>
 </div>
