@@ -62,14 +62,18 @@ footer {
 
 .footer-main {	
 	margin-bottom: 0px !important;
-	
 	background-color: #222 !important;
+}
+
+.footer-container {
+	display: inline;
+	color: white;
+	
+	max-width: 800px;
 }
 
 .footer-social {
 	float: left;
-	
-	margin-top: 6px;
 }
 
 .footer-social img {
@@ -78,8 +82,6 @@ footer {
 
 .footer-powered-by {
 	float: right;
-	
-	color: white;
 }
 
 .footer-powered-by p {
@@ -89,6 +91,7 @@ footer {
 
 .footer-powered-by img {
 	width: 30px;
+	height: 30px;
 	
 	-webkit-transition: all 1s ease-in-out;
 	-moz-transition: all 1s ease-in-out;
