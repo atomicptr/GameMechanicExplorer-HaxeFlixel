@@ -1,5 +1,11 @@
-body {
-	padding-top: 50px;
+html, body {
+	height: 100%;
+}
+
+#wrapper {
+	min-height: 100%;
+	
+	margin: 0 auto -100px;
 }
 
 .game-container {
@@ -26,16 +32,62 @@ body {
 	text-align: left;
 }
 
-.footer {
-	text-align: center;
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
 .list-group-menu-hover-hack:hover {
 	background-color: #daedf8 !important;
 }
 
 .list-group-stupid-thing {
 	background-color: white !important;
+}
+
+#push {
+	overflow: auto;
+	padding-bottom: 120px;
+}
+
+footer {
+	position: relative;
+	margin-top: -30px;
+	height: 30px;
+	clear: both;
+}
+
+.footer-main {
+	min-height: 30px;
+	text-shadow: none;
+	
+	margin-bottom: 0px !important;
+	
+	background-color: #222 !important;
+}
+
+.footer-social {
+	margin-top: 27px;
+	float: left;
+}
+
+.footer-powered-by {
+	float: right;
+	margin-top: 10px;
+	
+	color: white;
+}
+
+.footer-powered-by p {
+	display: inline;
+	font-size: 14px;
+}
+
+.footer-powered-by img {
+	width: 30px;
+	
+	-webkit-transition: all 1s ease-in-out;
+	-moz-transition: all 1s ease-in-out;
+	-ms-transition: all 1s ease-in-out;
+	-o-transition: all 1s ease-in-out;
+	transition: all 1s ease-in-out;
+}
+
+.footer-powered-by .jekyll-logo {
+	width: 40px !important;
 }

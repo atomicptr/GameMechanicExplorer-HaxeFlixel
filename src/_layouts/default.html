@@ -43,11 +43,13 @@
 	</div>
 </div>
 
-{{ content }}
-
-<div class="footer">
-	Haxe Port, Copyright &copy; <a href="https://twitter.com/kasoki">Christopher Kaster</a> 2014. Assets and initial project, Copyright &copy; <a href="https://twitter.com/yafd">John Watson</a> 2014.
+<div id="wrapper">
+	{{ content }}
+	
+	<div id="push"></div>
 </div>
+
+{% include footer.html %}
 
 <!-- scripts -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
