@@ -127,22 +127,10 @@ module Jekyll
 
     def alias_template(destination_path)
       <<-EOF
-      <!DOCTYPE html>
-      <html>
-      <head>
-      <title>Redirecting...</title>
-      <link rel="canonical" href="#{destination_path}"/>
-      <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-      <meta http-equiv="refresh" content="0; url=#{destination_path}" />
-      </head>
-      <body>
-        <p><strong>Redirecting...</strong></p>
-        <p><a href='#{destination_path}'>Click here if you are not redirected.</a></p>
+        <!doctype html>
         <script>
-          document.location.href = "#{destination_path}";
+	      window.location = "#{destination_path}";
         </script>
-      </body>
-      </html>
       EOF
     end
   end
