@@ -29,14 +29,14 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/"><img id="brand-logo" src="/web/images/haxeflixel.svg" /> Game Mechanic Explorer</a>
+			<a class="navbar-brand" href="{{ site.baseurl }}"><img id="brand-logo" src="/web/images/haxeflixel.svg" /> Game Mechanic Explorer</a>
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
 				{% if page.use_dropdown %}
 					{% include example_dropdown.html %}
 				{% endif %}
-				<li {% if page.about_active %}class="active"{% endif %}><a href="/about.html">About</a></li>
+				<li {% if page.about_active %}class="active"{% endif %}><a href="/about">About</a></li>
 				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
 			</ul>
 		</div><!--/.nav-collapse -->
