@@ -1,0 +1,40 @@
+{% if page.dropdown == "walking-and-jumping" %}
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">Walking and Jumping <b class="caret"></b></a>
+		<ul class="dropdown-menu">
+			<li><a href="..">Go back to "Walking and Jumping"</a></li>
+			<li class="divider"></li>
+			<li><a href="../basic-walking">Basic walking</a></li>
+			<li><a href="../with-acceleration">With acceleration</a></li>
+			<li><a href="../with-drag">With drag</a></li>
+			<li><a href="../jumping">Jumping</a></li>
+			<li><a href="../double-jump">Double jump</a></li>
+			<li><a href="../variable-jump-height">Variable jump height</a></li>
+		</ul>
+	</li>
+{% elsif page.dropdown == "bullets" %}
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">Bullets <b class="caret"></b></a>
+		<ul class="dropdown-menu">
+			<li><a href="..">Go back to "Bullets"</a></li>
+			<li class="divider"></li>
+			<li><a href="../single-shot">Single shot</a></li>
+			<li><a href="../rapid-fire">Rapid fire</a></li>
+			<li><a href="../aiming">Aiming</a></li>
+			<li><a href="../artillery">Artillery</a></li>
+			<li><a href="../display-trajectory">Display trajectory</a></li>
+		</ul>
+	</li>
+{% elsif page.dropdown == "spaceship-motion" %}
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">Spaceship Motion <b class="caret"></b></a>
+		<ul class="dropdown-menu">
+			<li><a href="..">Go back to "Spaceship Motion"</a></li>
+			<li class="divider"></li>
+			<li><a href="../basic-movement">Basic movement</a></li>
+			<li><a href="../with-drag">With drag</a></li>
+		</ul>
+	</li>
+{% else %}
+	<li><a href="#">Unknown dropdown "{{ page.dropdown }}"</a></li>
+{% endif %}

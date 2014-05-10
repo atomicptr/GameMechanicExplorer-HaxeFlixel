@@ -10,7 +10,7 @@
 <link rel="shortcut icon" href="/web/images/favicon.ico">
 
 <!-- stylesheets -->
-<link type="text/css" rel="stylesheet" href="/web/lib/bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link type="text/css" rel="stylesheet" href="/web/styles/style.css" />
 <link type="text/css" rel="stylesheet" href="/web/lib/shjs/sh_style.css" />
 
@@ -33,8 +33,8 @@
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				{% if page.use_back %}
-					<li><a id="back-link" href="{{ page.back_link }}"><span class="glyphicon glyphicon-backward"></span> Back to <span id="back-text">"{{ page.back_name }}"</span></a></li>
+				{% if page.use_dropdown %}
+					{% include example_dropdown.html %}
 				{% endif %}
 				<li {% if page.about_active %}class="active"{% endif %}><a href="/about.html">About</a></li>
 				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
@@ -50,7 +50,8 @@
 </div>
 
 <!-- scripts -->
-<script src="/web/lib/jquery.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 {% if page.is_example %}
 	<script src="/web/lib/shjs/sh_main.min.js"></script>
