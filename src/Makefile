@@ -1,6 +1,6 @@
 .PHONY: all
 
 all:
-	$(MAKE) -C WalkingAndJumping
-	$(MAKE) -C Bullets
-	$(MAKE) -C SpaceshipMotion
+	$(MAKE) -C examples/walking-and-jumping
+	$(MAKE) -C examples/bullets
+	$(MAKE) -C examples/spaceship-motion
