@@ -7,12 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Game Mechanic Explorer for HaxeFlixel">
 <meta name="author" content="Christopher Kaster">
-<link rel="shortcut icon" href="/web/images/favicon.ico">
+<link rel="shortcut icon" href="{% asset_path favicon.ico %}">
 
 <!-- stylesheets -->
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-<link type="text/css" rel="stylesheet" href="/web/styles/style.css" />
-<link type="text/css" rel="stylesheet" href="/web/lib/shjs/sh_style.css" />
+{% stylesheet main %}
+{% stylesheet sh_style %}
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -29,7 +29,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{{ site.baseurl }}"><img id="brand-logo" src="/web/images/haxeflixel.svg" /> Game Mechanic Explorer</a>
+			<a class="navbar-brand" href="{{ site.baseurl }}"><img id="brand-logo" src="{% asset_path haxeflixel.svg %}" /> Game Mechanic Explorer</a>
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
@@ -37,7 +37,7 @@
 					{% include example_dropdown.html %}
 				{% endif %}
 				<li {% if page.about_active %}class="active"{% endif %}><a href="/about">About</a></li>
-				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/web/images/github_logo.png" /> Github</a></li>
+				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="{% asset_path github_logo.png %}" /> Github</a></li>
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div>
@@ -54,9 +54,9 @@
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 {% if page.is_example %}
-	<script src="/web/lib/shjs/sh_main.min.js"></script>
-	<script src="/web/lib/shjs/sh_haxe.min.js"></script>
-	<script src="/web/scripts/main.js"></script>
+	{% javascript sh_main.min %}
+	{% javascript sh_haxe.min %}
+	{% javascript main %}
 {% endif %}
 
 <!-- analytics -->

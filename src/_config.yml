@@ -1,3 +1,5 @@
 safe: false
 permalink: pretty
 google-analytics-id: "UA-50573809-1"
+
+gems: [jekyll-assets]
