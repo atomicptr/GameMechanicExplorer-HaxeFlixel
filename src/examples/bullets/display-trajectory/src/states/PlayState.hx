@@ -113,7 +113,7 @@ class PlayState extends FlxState {
 		// add to elapsed time
 		elapsed += FlxG.elapsed;
 
-		// drwa the trajectory every frame
+		// draw the trajectory every frame
 		this.drawTrajectory();
 		
 		// set the gun angle
