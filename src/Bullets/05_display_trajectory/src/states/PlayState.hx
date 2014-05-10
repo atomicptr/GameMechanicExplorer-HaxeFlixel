@@ -16,9 +16,6 @@ import flixel.util.FlxAngle;
 import flixel.FlxObject;
 import flixel.util.FlxSpriteUtil;
 
-import flash.display.BitmapData;
-import flash.geom.Rectangle;
-
 class PlayState extends FlxState {
 
 	// a sprite that represents our gun
@@ -157,6 +154,7 @@ class PlayState extends FlxState {
 	private function drawTrajectory():Void {
 		FlxSpriteUtil.beginDraw(0x00000000);
 		
+		// clear the screen
 		FlxSpriteUtil.fill(trajectory, 0x00000000);
 		
 		// calculate a time offset. This offset is used to alter the starting
