@@ -14,6 +14,7 @@ import flixel.group.FlxTypedGroup;
 import flixel.util.FlxTimer;
 import flixel.util.FlxAngle;
 import flixel.FlxObject;
+import flixel.util.FlxSpriteUtil;
 
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
@@ -96,7 +97,7 @@ class PlayState extends FlxState {
 		explosionPool = new FlxTypedGroup<FlxSprite>();
 		
 		trajectory = new FlxSprite();
-		trajectory.pixels = new BitmapData(FlxG.width, FlxG.height);
+		trajectory.makeGraphic(FlxG.width, FlxG.height, 0x00000000);
 		
 		// add gun and bulletPool to this FlxState (this is what causes them to update and draw)
 		this.add(ground);
@@ -154,10 +155,9 @@ class PlayState extends FlxState {
 	}
 
 	private function drawTrajectory():Void {
-		var colorTransparent = 0x00000000;
+		FlxSpriteUtil.beginDraw(0x00000000);
 		
-		// clear the bitmap
-		trajectory.pixels.fillRect(new Rectangle(0, 0, FlxG.width, FlxG.height), colorTransparent);
+		FlxSpriteUtil.fill(trajectory, 0x00000000);
 		
 		// calculate a time offset. This offset is used to alter the starting
 		// time of the draw loop so that the dots are offset a little bit each
@@ -181,7 +181,7 @@ class PlayState extends FlxState {
 			x = BULLET_SPEED * t * Math.cos(theta) * correctionFactor;
 			y = BULLET_SPEED * t * Math.sin(theta) * correctionFactor - 0.5 * GRAVITY * t * t;
 			
-			trajectory.pixels.fillRect(new Rectangle(x + gun.x + gun.origin.x, gun.y + gun.origin.y - y, 3, 3), 0x80FFFFFF);
+			FlxSpriteUtil.drawRect(trajectory, x + gun.x + gun.origin.x, gun.y + gun.origin.y - y, 3, 3, 0x80FFFFFF);
 			
 			if(y < -15) {
 				break;
@@ -189,6 +189,7 @@ class PlayState extends FlxState {
 			
 			t += 0.03;
 		}
+		FlxSpriteUtil.endDraw(trajectory);
 		
 		trajectory.dirty = true;
 	}
