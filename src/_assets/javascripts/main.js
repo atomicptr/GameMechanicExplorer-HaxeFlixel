@@ -27,6 +27,11 @@ $(document).ready(function() {
 		$("#game-frame").width(1);
 		$("#game-frame").height(1);
 	}
+	
+	// check if fullscreen api is available, if not remove fullscreen button
+	if(!fullscreenAvailable()) {
+		$("#btn-fullscreen").remove();
+	}
 });
 
 // reload page on orientation change
@@ -35,8 +40,6 @@ $(window).on('orientationchange', function(e) {
 });
 
 function gameframe_fullscreen() {
-
-	
 	var gameFrame = document.getElementById('game-frame');
 	
 	if(gameFrame.webkitRequestFullscreen) {
@@ -48,6 +51,13 @@ function gameframe_fullscreen() {
 	}
 	
 	gameFrame.focus();
+}
+
+function fullscreenAvailable() {
+	var gameFrame = document.getElementById('game-frame');
+	var isAvailable = gameFrame.webkitRequestFullscreen || gameFrame.mozRequestFullscreen || gameFrame.msRequestFullscreen;
+	
+	return isAvailable;
 }
 
 $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {	
