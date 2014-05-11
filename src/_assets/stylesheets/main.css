@@ -5,7 +5,7 @@ html, body {
 #wrapper {
 	min-height: 100%;
 	
-	margin: 0 auto -100px;
+	margin: 0 auto -50px;
 }
 
 .game-container {
@@ -50,38 +50,25 @@ html, body {
 
 #push {
 	overflow: auto;
-	padding-bottom: 120px;
+	padding-bottom: 100px;
 }
 
 footer {
 	position: relative;
-	margin-top: -30px;
-	height: 30px !important;
+	margin-top: -50px;
+	height: 50px !important;
 	clear: both;
-}
-
-.footer-main {	
+	
+	color: white;
+	
 	margin-bottom: 0px !important;
 	background-color: #222 !important;
 }
 
-.footer-container {
-	display: inline;
-	color: white;
-	
-	max-width: 800px;
-}
-
-.footer-social {
-	float: left;
-}
-
-.footer-social img {
-	width: 30px;
-}
-
 .footer-powered-by {
 	float: right;
+	
+	margin-top: 10px;
 }
 
 .footer-powered-by p {
