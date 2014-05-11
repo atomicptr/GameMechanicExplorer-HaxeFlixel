@@ -99,3 +99,7 @@ footer {
 .footer-powered-by .jekyll-logo {
 	width: 40px !important;
 }
+
+#btn-download-apk {
+	display: none;
+}
