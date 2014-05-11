@@ -1,0 +1,8 @@
+build:
+	mkdir -p bin
+	tar czf bin/gme-example.tar.gz assets src project.xml
+	lime build html5 -minify -yui
+	
+	{% if site.build_android %}
+	lime build android
+	{% endif %}

@@ -1,6 +1,7 @@
 safe: false
 permalink: pretty
 google-analytics-id: "UA-50573809-1"
+build_android: false
 
 assets:
     js_compressor: yui

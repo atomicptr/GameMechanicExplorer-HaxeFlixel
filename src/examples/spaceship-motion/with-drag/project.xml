@@ -1,22 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<project>
-	<app title="Game Mechanic Explorer" file="gme" main="Main" version="1.0.0" company="Christopher Kaster" />
-	<app preloader="flixel.system.FlxPreloader" />
-	
-	<window width="800" height="480" fps="60" hardware="true" vsync="true" />
-	
-	<window if="web" orientation="portrait" />
-
-	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" />
-
-	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" />
-	
-	<set name="BUILD_DIR" value="bin" />
-	<classpath name="src" />
-	
-	<haxelib name="flixel"/>
-	
-	<haxedef name="FLX_NO_DEBUG" unless="debug" />
-	
-	<assets path="assets" />
-</project>
+---
+layout: lime_project
+title: Spaceship Motion - With Drag
+package: de.kasoki.gme.spaceshipmotion.withdrag
+---
