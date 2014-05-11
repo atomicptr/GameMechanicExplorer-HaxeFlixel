@@ -1,7 +1,7 @@
 <li class="dropdown">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-download-alt"></span> Download <b class="caret"></b></a>
 	<ul class="dropdown-menu">
-		<li><a href="bin/gme-example.tar.gz">Download project</a></li>
+		<li><a href="bin/gme-example.tar.gz" {% if page.project_file_name %} download="{{ page.project_file_name }}" {% endif %}>Download project</a></li>
 		<li class="divider"></li>
 		<li><a href="/assets.zip">Download assets</a></li>
 	</ul>
