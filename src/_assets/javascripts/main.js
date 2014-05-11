@@ -41,8 +41,10 @@ function gameframe_fullscreen() {
 	
 	if(gameFrame.webkitRequestFullscreen) {
 		gameFrame.webkitRequestFullscreen();
-	} else {
+	} else if(gameFrame.mozRequestFullscreen) {
 		gameFrame.mozRequestFullscreen();
+	} else {
+		gameFrame.msRequestFullscreen();
 	}
 	
 	gameFrame.focus();
