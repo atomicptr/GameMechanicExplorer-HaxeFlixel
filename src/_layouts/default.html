@@ -38,6 +38,10 @@
 				{% endif %}
 				<li {% if page.about_active %}class="active"{% endif %}><a href="/about">About</a></li>
 				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="{% asset_path github_logo.png %}" /> Github</a></li>
+				
+				{% if page.is_example %}
+					{% include download_dropdown.html %}
+				{% endif %}
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div>
