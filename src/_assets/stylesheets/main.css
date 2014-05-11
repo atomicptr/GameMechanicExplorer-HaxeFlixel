@@ -16,6 +16,11 @@ html, body {
 	text-align: center;
 }
 
+.game-container iframe {
+	width: 100%;
+	height: 480px;
+}
+
 #brand-logo {
 	width: 24px;
 	height: 24px;

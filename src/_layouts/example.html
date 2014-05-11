@@ -11,8 +11,9 @@ is_example: true
 
 <div class="container content-container">
 	<div class="game-container">
-		<iframe frameBorder=0 width=800 height=480 src="bin/html5/bin/index.html"></iframe>
+		<iframe id="game-frame" frameBorder="0" allowfullscreen="true" src="bin/html5/bin/index.html"></iframe>
 	</div>
+	<button class="btn btn-primary btn-lg" onclick="gameframe_fullscreen();">Fullscreen</button>
 
 	<h2>Notes</h2>
 	<p id="example-notes" class="lead">
