@@ -1,6 +1,3 @@
-var should_hide = false;
-var is_hidden = false;
-
 $(document).ready(function() {
 	$("#btn-download-apk").hide();
 
@@ -50,8 +47,8 @@ function gameframe_fullscreen() {
 	
 	if(gameFrame.webkitRequestFullscreen) {
 		gameFrame.webkitRequestFullscreen();
-	} else if(gameFrame.mozRequestFullscreen) {
-		gameFrame.mozRequestFullscreen();
+	} else if(gameFrame.mozRequestFullScreen) {
+		gameFrame.mozRequestFullScreen();
 	} else {
 		gameFrame.msRequestFullscreen();
 	}
@@ -61,7 +58,7 @@ function gameframe_fullscreen() {
 
 function fullscreenAvailable() {
 	var gameFrame = document.getElementById('game-frame');
-	var isAvailable = gameFrame.webkitRequestFullscreen || gameFrame.mozRequestFullscreen || gameFrame.msRequestFullscreen;
+	var isAvailable = gameFrame.webkitRequestFullscreen || gameFrame.mozRequestFullScreen || gameFrame.msRequestFullscreen;
 	
 	return isAvailable;
 }
