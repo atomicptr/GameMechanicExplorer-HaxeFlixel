@@ -1,0 +1,105 @@
+html, body {
+	height: 100%;
+}
+
+#wrapper {
+	min-height: 100%;
+	
+	margin: 0 auto -50px;
+}
+
+.jumbotron {
+	padding-top: 50px;
+}
+
+.game-container {
+	text-align: center;
+}
+
+.game-container iframe {
+	width: 100%;
+	height: 480px;
+}
+
+#brand-logo {
+	width: 24px;
+	height: 24px;
+
+	padding-bottom: 3px;
+}
+
+.github-icon {
+	padding-bottom: 4px;
+}
+
+.content-container {
+	text-align: left;
+}
+
+.code-container {
+	margin-bottom: 50px;
+	text-align: left;
+}
+
+.list-group-menu-hover-hack:hover {
+	background-color: #daedf8 !important;
+}
+
+.list-group-stupid-thing {
+	background-color: white !important;
+}
+
+.btn-back {
+	float: left;
+}
+
+.btn-next {
+	float: right;
+}
+
+#push {
+	overflow: auto;
+	padding-bottom: 100px;
+}
+
+footer {
+	position: relative;
+	margin-top: -50px;
+	height: 50px !important;
+	clear: both;
+	
+	color: white;
+	
+	margin-bottom: 0px !important;
+	background-color: #222 !important;
+}
+
+.footer-powered-by {
+	float: right;
+	
+	margin-top: 10px;
+}
+
+.footer-powered-by p {
+	display: inline;
+	font-size: 14px;
+}
+
+.footer-powered-by img {
+	width: 30px;
+	height: 30px;
+	
+	-webkit-transition: all 1s ease-in-out;
+	-moz-transition: all 1s ease-in-out;
+	-ms-transition: all 1s ease-in-out;
+	-o-transition: all 1s ease-in-out;
+	transition: all 1s ease-in-out;
+}
+
+.footer-powered-by .jekyll-logo {
+	width: 40px !important;
+}
+
+#btn-download-apk {
+	display: none;
+}

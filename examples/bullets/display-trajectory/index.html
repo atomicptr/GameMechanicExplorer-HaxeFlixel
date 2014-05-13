@@ -1,0 +1,155 @@
+<!doctype html>
+<title>Display Trajectory</title>
+
+<!-- meta stuff -->
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Game Mechanic Explorer for HaxeFlixel">
+<meta name="author" content="Christopher Kaster">
+<link rel="shortcut icon" href="/assets/favicon-20a77d9b7c9bba9a1f642ba245ad75dd.ico">
+
+<!-- stylesheets -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="/assets/main-fcacfa25402e38ce4c5d98be595122bd.css">
+<link rel="stylesheet" href="/assets/sh_style-1a65106d9cb5ea988773427415d722ef.css">
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/"><img id="brand-logo" src="/assets/haxeflixel-edb8c93212b4cb7c2b830809b91785a8.svg" /> Game Mechanic Explorer</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				
+					
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-folder-open"></span> &nbsp;Bullets <b class="caret"></b></a>
+		<ul class="dropdown-menu">
+			<li><a href="..">Go back to "Bullets"</a></li>
+			<li class="divider"></li>
+			<li><a href="../single-shot">Single shot</a></li>
+			<li><a href="../rapid-fire">Rapid fire</a></li>
+			<li><a href="../aiming">Aiming</a></li>
+			<li><a href="../artillery">Artillery</a></li>
+			<li><a href="../display-trajectory">Display trajectory</a></li>
+		</ul>
+	</li>
+
+				
+				<li ><a href="/about">About</a></li>
+				<li><a href="https://github.com/kasoki/GameMechanicExplorer-HaxeFlixel"><img class="github-icon" src="/assets/github_logo-a0b127d6ac675c31b025e23fd5eaec15.png" /> Github</a></li>
+				
+				
+					<li class="dropdown">
+	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-download-alt"></span> Download <b class="caret"></b></a>
+	<ul class="dropdown-menu">
+		<li><a href="bin/gme-example.tar.gz"  download="gme-bullets-display-trajectory.tar.gz" >Download project</a></li>
+		<li class="divider"></li>
+		<li><a href="/assets.zip">Download assets</a></li>
+	</ul>
+</li>
+				
+			</ul>
+		</div><!--/.nav-collapse -->
+	</div>
+</div>
+
+<div id="wrapper">
+	<div class="jumbotron">
+	<div class="container">
+		<h1 id="example-title">Display Trajectory</h1>
+	</div>
+</div>
+
+<div class="container content-container">
+	<div class="game-container">
+		<iframe id="game-frame" frameBorder="0" allowfullscreen="true" src="bin/html5/bin/index.html"></iframe>
+	</div>
+	<button id="btn-fullscreen" class="btn btn-primary btn-lg" onclick="gameframe_fullscreen();">Fullscreen</button>
+	
+	
+	<h2>Notes</h2>
+	<p id="example-notes" class="lead">
+		Click or tap to fire an artillery shell. Hold to fire multiple shots.<br/>
+<br/>
+The trajectory is calculated and plotted based on the firing angle, gravity, and initial bullet velocity.
+	</p>
+
+	<h2>Source</h2>
+	<div class="code-container">
+		<pre class="sh_haxe" id="code-example"></pre>
+	</div>
+	
+	<div class="example-nav-box">
+		
+			<a href="../artillery">
+				<button class="btn btn-info btn-lg btn-back"><span class="glyphicon glyphicon-chevron-left"></span> Back</button>
+			</a>
+		
+		
+		
+	</div>
+</div>
+	
+	<div id="push"></div>
+</div>
+
+<footer>
+	<div class="container">
+		<div class="footer-powered-by">
+			<p>Powered by</p>
+			<a href="http://haxe.org"><img src="/assets/haxe-c7ff2f1ca5caf46e8ee0e81a783bc162.svg" alt="Haxe" title="Haxe" /></a>
+			+
+			<a href="http://openfl.org"><img src="/assets/openfl-d82eef42c0859c9a4725bb38a8457027.svg" alt="OpenFL" title="OpenFL" /></a>
+			+
+			<a href="http://haxeflixel.com"><img src="/assets/haxeflixel-edb8c93212b4cb7c2b830809b91785a8.svg" alt="HaxeFlixel" title="HaxeFlixel" /></a>
+			+
+			<a href="http://jekyllrb.com"><img class="jekyll-logo" src="/assets/jekyll-bd0c45118e43dd2df5e006db2deeef46.svg" alt="jekyll" title="jekyll" /></a>
+		</div>
+	</div>
+</footer>
+
+<!-- scripts -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+
+	<script src="/assets/sh_main-e454efd844e9943484f8b24bda6e4321.min"></script>
+	<script src="/assets/sh_haxe-17d55ca59cc27625513bb54a90264991.min"></script>
+	<script src="/assets/main-a6c660777cb5540a134d50e44bc68aec.js"></script>
+
+
+<script>
+	$(document).ready(function() {
+		$(".github-icon").parent().mouseover(function() {
+			$(".github-icon").attr("src", "/assets/github_logo_hover-c5a705d939bf34c3ee529492959f8bf3.png");
+		});
+		
+		$(".github-icon").parent().mouseleave(function() {
+			$(".github-icon").attr("src", "/assets/github_logo-a0b127d6ac675c31b025e23fd5eaec15.png");
+		});
+	});
+</script>
+
+<!-- analytics -->
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-50573809-1', 'kasoki.de');
+	ga('send', 'pageview');
+</script>
