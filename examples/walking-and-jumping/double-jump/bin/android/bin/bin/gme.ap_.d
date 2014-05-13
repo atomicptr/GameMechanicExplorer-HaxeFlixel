@@ -1,0 +1,20 @@
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/gme.ap_ \
+ : /Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/res/drawable-hdpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/res/drawable-ldpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/res/drawable-mdpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/res/drawable-xhdpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/res/drawable-xhdpi/ouya_icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/res/drawable-hdpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/res/drawable-ldpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/res/drawable-mdpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/res/drawable-xhdpi/icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/res/drawable-xhdpi/ouya_icon.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/manifest \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets/ground.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets/heightmarker.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets/player.png \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets/sounds \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets/sounds/beep.ogg \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/assets/assets/sounds/flixel.ogg \
+/Users/kasoki/dev/gamemechanicexplorer-haxeflixel/bin/examples/walking-and-jumping/double-jump/bin/android/bin/bin/AndroidManifest.xml \
