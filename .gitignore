@@ -1,0 +1,17 @@
+**/android/haxe
+**/android/obj
+**/android/bin/assets
+**/android/bin/deps
+**/android/bin/gen
+**/android/bin/libs
+**/android/bin/res
+**/android/bin/src
+**/android/bin/*.xml
+**/android/bin/bin/*.dex*
+**/android/bin/bin/*.d
+**/android/bin/bin/*-unaligned*
+**/android/bin/bin/classes
+**/android/bin/bin/dexedLibs
+**/android/bin/bin/res
+
+**/html5/haxe
