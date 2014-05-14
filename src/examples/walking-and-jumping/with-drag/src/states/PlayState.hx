@@ -88,28 +88,22 @@ class PlayState extends FlxState {
 		FlxG.collide(player, ground);
 	}
 
-	private function leftPressed():Bool {
-		var touch = FlxG.touches.getFirst();
+	private function leftPressed(?useJustPressed:Bool = false):Bool {
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["LEFT"]) : FlxG.keys.anyJustPressed(["LEFT"]);
 
-		var leftKeyPressed = FlxG.keys.anyPressed(["LEFT"]);
-		var touchLeft = false;
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
-		if(touch != null) {
-			touchLeft = touch.screenX < FlxG.width / 2;
-		}
+		var touchLeft = pressed && FlxG.mouse.x < FlxG.width / 4;
 
 		return leftKeyPressed || touchLeft;
 	}
 
-	private function rightPressed():Bool {
-		var touch = FlxG.touches.getFirst();
+	private function rightPressed(?useJustPressed:Bool = false):Bool {
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["RIGHT"]) : FlxG.keys.anyJustPressed(["RIGHT"]);
 
-		var rightKeyPressed = FlxG.keys.anyPressed(["RIGHT"]);
-		var touchRight = false;
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
-		if(touch != null) {
-			touchRight = touch.screenX > FlxG.width /2;
-		}
+		var touchRight = pressed && FlxG.mouse.x > FlxG.width / 2 + FlxG.width / 4;
 
 		return rightKeyPressed || touchRight;
 	}
