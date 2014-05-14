@@ -100,17 +100,17 @@ class PlayState extends FlxState {
 
 	// update() method is called every frame
 	public override function update():Void {
-		if(FlxG.keys.anyPressed(["LEFT"])) {
+		if(leftPressed()) {
 			// if the LEFT key is down, set the players velocity to move left
 			player.acceleration.x = -this.ACCELERATION;
-		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
+		} else if(rightPressed()) {
 			// if the RIGHT key is down, set the players velocity to move right
 			player.acceleration.x = this.ACCELERATION;
 		} else {
 			player.acceleration.x = 0;
 		}
 
-		if(player.isTouching(FlxObject.FLOOR) && FlxG.keys.anyPressed(["UP"])) {
+		if(player.isTouching(FlxObject.FLOOR) && upPressed()) {
 			// jump when the player is touching the ground an the up arrow is pressed;
 			player.velocity.y = this.JUMP_SPEED;
 		}
@@ -119,5 +119,44 @@ class PlayState extends FlxState {
 
 		// collide the player with the ground
 		FlxG.collide(player, ground);
+	}
+
+	private function leftPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var leftKeyPressed = FlxG.keys.anyPressed(["LEFT"]);
+		var touchLeft = false;
+
+		if(touch != null) {
+			touchLeft = touch.screenX < FlxG.width / 2;
+		}
+
+		return leftKeyPressed || touchLeft;
+	}
+
+	private function rightPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var rightKeyPressed = FlxG.keys.anyPressed(["RIGHT"]);
+		var touchRight = false;
+
+		if(touch != null) {
+			touchRight = touch.screenX > FlxG.width /2;
+		}
+
+		return rightKeyPressed || touchRight;
+	}
+
+	private function upPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var upKeyPressed = FlxG.keys.anyPressed(["UP"]);
+		var touchUp = false;
+
+		if(touch != null) {
+			touchUp = touch.screenY < FlxG.height /2;
+		}
+
+		return upKeyPressed || touchUp;
 	}
 }

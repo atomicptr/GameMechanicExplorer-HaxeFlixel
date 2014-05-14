@@ -117,10 +117,10 @@ class PlayState extends FlxState {
 	public override function update():Void {
 		var onTheGround = player.isTouching(FlxObject.FLOOR);
 
-		if(FlxG.keys.anyPressed(["LEFT"])) {
+		if(leftPressed()) {
 			// if the LEFT key is down, set the players velocity to move left
 			player.acceleration.x = -this.ACCELERATION;
-		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
+		} else if(rightPressed()) {
 			// if the RIGHT key is down, set the players velocity to move right
 			player.acceleration.x = this.ACCELERATION;
 		} else {
@@ -132,7 +132,7 @@ class PlayState extends FlxState {
 			this.canVariableJump = true;
 		}
 
-		if(FlxG.keys.anyJustPressed(["UP"])) {
+		if(upPressed(true /* just pressed */)) {
 			if(canDoubleJump && !timerStarted) {
 				canVariableJump = true;
 			}
@@ -148,7 +148,7 @@ class PlayState extends FlxState {
 		}
 
 		// keep y velocity constant while the jump button is held for up to 400ms (default value)
-		if(canVariableJump && FlxG.keys.anyPressed(["UP"])) {
+		if(canVariableJump && upPressed()) {
 
 			// start timer
 			if(!timerStarted) {
@@ -177,5 +177,50 @@ class PlayState extends FlxState {
 
 		// reset variable to use timer again
 		timerStarted = false;
+	}
+
+	private function leftPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var leftKeyPressed = FlxG.keys.anyPressed(["LEFT"]);
+		var touchLeft = false;
+
+		if(touch != null) {
+			touchLeft = touch.screenX < FlxG.width / 2;
+		}
+
+		return leftKeyPressed || touchLeft;
+	}
+
+	private function rightPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var rightKeyPressed = FlxG.keys.anyPressed(["RIGHT"]);
+		var touchRight = false;
+
+		if(touch != null) {
+			touchRight = touch.screenX > FlxG.width /2;
+		}
+
+		return rightKeyPressed || touchRight;
+	}
+
+	private function upPressed(useJustPressed:Bool = false):Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var upKeyPressed = FlxG.keys.anyPressed(["UP"]);
+		var touchUp = false;
+
+		if(touch != null) {
+			var mod = true;
+
+			if(!useJustPressed) {
+				mod = touch.justPressed;
+			}
+
+			touchUp = mod && touch.screenY < FlxG.height /2;
+		}
+
+		return upKeyPressed || touchUp;
 	}
 }

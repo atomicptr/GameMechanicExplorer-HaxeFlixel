@@ -66,10 +66,10 @@ class PlayState extends FlxState {
 	public override function update():Void {
 		super.update();
 
-		if(FlxG.keys.anyPressed(["LEFT"])) {
+		if(leftPressed()) {
 			// if the LEFT key is down, set the players velocity to move left
 			player.velocity.x = -this.MAX_SPEED;
-		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
+		} else if(rightPressed()) {
 			// if the RIGHT key is down, set the players velocity to move right
 			player.velocity.x = this.MAX_SPEED;
 		} else {
@@ -79,5 +79,31 @@ class PlayState extends FlxState {
 
 		// collide the player with the ground
 		FlxG.collide(player, ground);
+	}
+
+	private function leftPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var leftKeyPressed = FlxG.keys.anyPressed(["LEFT"]);
+		var touchLeft = false;
+
+		if(touch != null) {
+			touchLeft = touch.screenX < FlxG.width / 2;
+		}
+
+		return leftKeyPressed || touchLeft;
+	}
+
+	private function rightPressed():Bool {
+		var touch = FlxG.touches.getFirst();
+
+		var rightKeyPressed = FlxG.keys.anyPressed(["RIGHT"]);
+		var touchRight = false;
+
+		if(touch != null) {
+			touchRight = touch.screenX > FlxG.width /2;
+		}
+
+		return rightKeyPressed || touchRight;
 	}
 }
