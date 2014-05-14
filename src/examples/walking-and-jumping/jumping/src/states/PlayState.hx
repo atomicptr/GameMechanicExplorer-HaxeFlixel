@@ -122,7 +122,7 @@ class PlayState extends FlxState {
 	}
 
 	private function leftPressed(?useJustPressed:Bool = false):Bool {
-		var leftKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["LEFT"]) : FlxG.keys.anyJustPressed(["LEFT"]);
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["LEFT"]) : FlxG.keys.anyPressed(["LEFT"]);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
@@ -132,7 +132,7 @@ class PlayState extends FlxState {
 	}
 
 	private function rightPressed(?useJustPressed:Bool = false):Bool {
-		var rightKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["RIGHT"]) : FlxG.keys.anyJustPressed(["RIGHT"]);
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["RIGHT"]) : FlxG.keys.anyPressed(["RIGHT"]);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
@@ -142,7 +142,7 @@ class PlayState extends FlxState {
 	}
 
 	private function upPressed(?useJustPressed:Bool = false):Bool {
-		var upKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["UP"]) : FlxG.keys.anyJustPressed(["UP"]);
+		var upKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["UP"]) : FlxG.keys.anyPressed(["UP"]);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
