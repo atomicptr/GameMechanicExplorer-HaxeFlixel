@@ -66,10 +66,10 @@ class PlayState extends FlxState {
 	public override function update():Void {
 		super.update();
 
-		if(FlxG.keys.anyPressed(["LEFT"])) {
+		if(leftPressed()) {
 			// if the LEFT key is down, set the players velocity to move left
 			player.velocity.x = -this.MAX_SPEED;
-		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
+		} else if(rightPressed()) {
 			// if the RIGHT key is down, set the players velocity to move right
 			player.velocity.x = this.MAX_SPEED;
 		} else {
@@ -79,5 +79,25 @@ class PlayState extends FlxState {
 
 		// collide the player with the ground
 		FlxG.collide(player, ground);
+	}
+
+	private function leftPressed(?useJustPressed:Bool = false):Bool {
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["LEFT"]) : FlxG.keys.anyJustPressed(["LEFT"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchLeft = pressed && FlxG.mouse.x < FlxG.width / 4;
+
+		return leftKeyPressed || touchLeft;
+	}
+
+	private function rightPressed(?useJustPressed:Bool = false):Bool {
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["RIGHT"]) : FlxG.keys.anyJustPressed(["RIGHT"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchRight = pressed && FlxG.mouse.x > FlxG.width / 2 + FlxG.width / 4;
+
+		return rightKeyPressed || touchRight;
 	}
 }

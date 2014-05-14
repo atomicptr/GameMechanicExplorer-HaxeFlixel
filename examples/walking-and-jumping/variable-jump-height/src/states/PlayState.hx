@@ -117,10 +117,10 @@ class PlayState extends FlxState {
 	public override function update():Void {
 		var onTheGround = player.isTouching(FlxObject.FLOOR);
 
-		if(FlxG.keys.anyPressed(["LEFT"])) {
+		if(leftPressed()) {
 			// if the LEFT key is down, set the players velocity to move left
 			player.acceleration.x = -this.ACCELERATION;
-		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
+		} else if(rightPressed()) {
 			// if the RIGHT key is down, set the players velocity to move right
 			player.acceleration.x = this.ACCELERATION;
 		} else {
@@ -132,7 +132,7 @@ class PlayState extends FlxState {
 			this.canVariableJump = true;
 		}
 
-		if(FlxG.keys.anyJustPressed(["UP"])) {
+		if(upPressed(true)) {
 			if(canDoubleJump && !timerStarted) {
 				canVariableJump = true;
 			}
@@ -148,7 +148,7 @@ class PlayState extends FlxState {
 		}
 
 		// keep y velocity constant while the jump button is held for up to 400ms (default value)
-		if(canVariableJump && FlxG.keys.anyPressed(["UP"])) {
+		if(canVariableJump && upPressed()) {
 
 			// start timer
 			if(!timerStarted) {
@@ -177,5 +177,35 @@ class PlayState extends FlxState {
 
 		// reset variable to use timer again
 		timerStarted = false;
+	}
+
+	private function leftPressed(?useJustPressed:Bool = false):Bool {
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["LEFT"]) : FlxG.keys.anyJustPressed(["LEFT"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchLeft = pressed && FlxG.mouse.x < FlxG.width / 4;
+
+		return leftKeyPressed || touchLeft;
+	}
+
+	private function rightPressed(?useJustPressed:Bool = false):Bool {
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["RIGHT"]) : FlxG.keys.anyJustPressed(["RIGHT"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchRight = pressed && FlxG.mouse.x > FlxG.width / 2 + FlxG.width / 4;
+
+		return rightKeyPressed || touchRight;
+	}
+
+	private function upPressed(?useJustPressed:Bool = false):Bool {
+		var upKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["UP"]) : FlxG.keys.anyJustPressed(["UP"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchUp = pressed && FlxG.mouse.y < FlxG.height /2;
+
+		return upKeyPressed || touchUp;
 	}
 }

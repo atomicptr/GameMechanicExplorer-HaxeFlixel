@@ -100,17 +100,17 @@ class PlayState extends FlxState {
 
 	// update() method is called every frame
 	public override function update():Void {
-		if(FlxG.keys.anyPressed(["LEFT"])) {
+		if(leftPressed()) {
 			// if the LEFT key is down, set the players velocity to move left
 			player.acceleration.x = -this.ACCELERATION;
-		} else if(FlxG.keys.anyPressed(["RIGHT"])) {
+		} else if(rightPressed()) {
 			// if the RIGHT key is down, set the players velocity to move right
 			player.acceleration.x = this.ACCELERATION;
 		} else {
 			player.acceleration.x = 0;
 		}
 
-		if(player.isTouching(FlxObject.FLOOR) && FlxG.keys.anyPressed(["UP"])) {
+		if(player.isTouching(FlxObject.FLOOR) && upPressed()) {
 			// jump when the player is touching the ground an the up arrow is pressed;
 			player.velocity.y = this.JUMP_SPEED;
 		}
@@ -119,5 +119,35 @@ class PlayState extends FlxState {
 
 		// collide the player with the ground
 		FlxG.collide(player, ground);
+	}
+
+	private function leftPressed(?useJustPressed:Bool = false):Bool {
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["LEFT"]) : FlxG.keys.anyJustPressed(["LEFT"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchLeft = pressed && FlxG.mouse.x < FlxG.width / 4;
+
+		return leftKeyPressed || touchLeft;
+	}
+
+	private function rightPressed(?useJustPressed:Bool = false):Bool {
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["RIGHT"]) : FlxG.keys.anyJustPressed(["RIGHT"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchRight = pressed && FlxG.mouse.x > FlxG.width / 2 + FlxG.width / 4;
+
+		return rightKeyPressed || touchRight;
+	}
+
+	private function upPressed(?useJustPressed:Bool = false):Bool {
+		var upKeyPressed = useJustPressed ? FlxG.keys.anyPressed(["UP"]) : FlxG.keys.anyJustPressed(["UP"]);
+
+		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
+
+		var touchUp = pressed && FlxG.mouse.y < FlxG.height /2;
+
+		return upKeyPressed || touchUp;
 	}
 }
