@@ -679,10 +679,10 @@ class DefaultAssetLibrary extends AssetLibrary {
 #elseif (windows || mac || linux)
 
 
-@:sound("/usr/local/haxe/lib/flixel/3,3,3/assets/sounds/beep.mp3") class __ASSET__assets_sounds_beep_mp3 extends flash.media.Sound {}
-@:sound("/usr/local/haxe/lib/flixel/3,3,3/assets/sounds/flixel.mp3") class __ASSET__assets_sounds_flixel_mp3 extends flash.media.Sound {}
-@:sound("/usr/local/haxe/lib/flixel/3,3,3/assets/sounds/beep.ogg") class __ASSET__assets_sounds_beep_ogg extends flash.media.Sound {}
-@:sound("/usr/local/haxe/lib/flixel/3,3,3/assets/sounds/flixel.ogg") class __ASSET__assets_sounds_flixel_ogg extends flash.media.Sound {}
+@:sound("B:/Programs/Haxe/haxe/lib/flixel/3,3,1/assets/sounds/beep.mp3") class __ASSET__assets_sounds_beep_mp3 extends flash.media.Sound {}
+@:sound("B:/Programs/Haxe/haxe/lib/flixel/3,3,1/assets/sounds/flixel.mp3") class __ASSET__assets_sounds_flixel_mp3 extends flash.media.Sound {}
+@:sound("B:/Programs/Haxe/haxe/lib/flixel/3,3,1/assets/sounds/beep.ogg") class __ASSET__assets_sounds_beep_ogg extends flash.media.Sound {}
+@:sound("B:/Programs/Haxe/haxe/lib/flixel/3,3,1/assets/sounds/flixel.ogg") class __ASSET__assets_sounds_flixel_ogg extends flash.media.Sound {}
 @:bitmap("assets/bullet.png") class __ASSET__assets_bullet_png extends flash.display.BitmapData {}
 
 

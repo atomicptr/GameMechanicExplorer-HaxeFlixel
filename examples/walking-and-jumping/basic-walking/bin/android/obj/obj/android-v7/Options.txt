@@ -1,0 +1,2 @@
+ -DFLX_NO_DEBUG="1" -DFLX_RENDER_TILE="1" -DHXCPP_ARMV7="1" -Dandroid="1" -Dandroid-9="1" -Dandroid_9="1" -Dflixel="1" -Dhaxe3="1" -Dhaxe_ver="3.103" -Dhxcpp="1" -Dhxcpp_api_level="311" -Dlime="1" -Dlime_native="1" -Dmobile="1" -Dno-compilation="1" -Dno_compilation="1" -Dopenfl="1" -Dopenfl-native="1" -Dopenfl_native="1" -Dtools="1.4.0"
+B:\Programs\Haxe\haxe\lib\hxcpp/3,1,30/

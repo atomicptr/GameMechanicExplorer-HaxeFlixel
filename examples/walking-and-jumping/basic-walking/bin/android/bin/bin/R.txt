@@ -1,0 +1,2 @@
+int drawable icon 0x7f020000
+int drawable ouya_icon 0x7f020001
