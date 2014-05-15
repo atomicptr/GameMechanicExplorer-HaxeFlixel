@@ -20,6 +20,10 @@ class PlayState extends FlxState {
 	// define movement constant
 	private var MAX_SPEED:Int = 250;
 
+	// define keys
+	private var LEFT_KEYS = ["LEFT", "A"];
+	private var RIGHT_KEYS = ["RIGHT", "D"];
+
 	// setup the example
 	public override function create():Void {
 		super.create();
@@ -82,7 +86,7 @@ class PlayState extends FlxState {
 	}
 
 	private function leftPressed(?useJustPressed:Bool = false):Bool {
-		var leftKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["LEFT"]) : FlxG.keys.anyPressed(["LEFT"]);
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(LEFT_KEYS) : FlxG.keys.anyPressed(LEFT_KEYS);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
@@ -92,7 +96,7 @@ class PlayState extends FlxState {
 	}
 
 	private function rightPressed(?useJustPressed:Bool = false):Bool {
-		var rightKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["RIGHT"]) : FlxG.keys.anyPressed(["RIGHT"]);
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(RIGHT_KEYS) : FlxG.keys.anyPressed(RIGHT_KEYS);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
