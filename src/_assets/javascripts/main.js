@@ -1,6 +1,4 @@
 $(document).ready(function() {
-	$("#btn-download-apk").hide();
-
 	// load script
 	$.get("src/states/PlayState.hx", function(data) {
 		$("#code-example").html(data);
@@ -30,11 +28,6 @@ $(document).ready(function() {
 	if(!fullscreenAvailable()) {
 		$("#btn-fullscreen").remove();
 	}
-	
-	// if android, show apk download button
-	if(isAndroid()) {
-		$("#btn-download-apk").show();
-	}
 });
 
 // reload page on orientation change
@@ -61,12 +54,6 @@ function fullscreenAvailable() {
 	var isAvailable = gameFrame.webkitRequestFullscreen || gameFrame.mozRequestFullScreen || gameFrame.msRequestFullscreen;
 	
 	return isAvailable;
-}
-
-function isAndroid() {
-	var ua = navigator.userAgent.toLowerCase();
-	
-	return ua.indexOf("android") > -1;
 }
 
 $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {	
