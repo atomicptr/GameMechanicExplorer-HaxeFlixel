@@ -28,6 +28,11 @@ class PlayState extends FlxState {
 	private var GRAVITY:Int = 980;
 	private var JUMP_SPEED:Int = -600; // negative y is up
 
+	// define keys
+	private var LEFT_KEYS = ["LEFT", "A"];
+	private var RIGHT_KEYS = ["RIGHT", "D"];
+	private var UP_KEYS = ["UP", "W", "SPACE"];
+
 	// setup the example
 	public override function create():Void {
 		super.create();
@@ -119,7 +124,7 @@ class PlayState extends FlxState {
 			canDoubleJump = true;
 		}
 
-		if(upPressed()) {
+		if(upPressed(true)) {
 			if(canDoubleJump || onTheGround) {
 				// jump when player is touching the ground or they can double jump
 				player.velocity.y = this.JUMP_SPEED;
@@ -138,7 +143,7 @@ class PlayState extends FlxState {
 	}
 
 	private function leftPressed(?useJustPressed:Bool = false):Bool {
-		var leftKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["LEFT"]) : FlxG.keys.anyPressed(["LEFT"]);
+		var leftKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(LEFT_KEYS) : FlxG.keys.anyPressed(LEFT_KEYS);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
@@ -148,7 +153,7 @@ class PlayState extends FlxState {
 	}
 
 	private function rightPressed(?useJustPressed:Bool = false):Bool {
-		var rightKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["RIGHT"]) : FlxG.keys.anyPressed(["RIGHT"]);
+		var rightKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(RIGHT_KEYS) : FlxG.keys.anyPressed(RIGHT_KEYS);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
@@ -158,7 +163,7 @@ class PlayState extends FlxState {
 	}
 
 	private function upPressed(?useJustPressed:Bool = false):Bool {
-		var upKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(["UP"]) : FlxG.keys.anyPressed(["UP"]);
+		var upKeyPressed = useJustPressed ? FlxG.keys.anyJustPressed(UP_KEYS) : FlxG.keys.anyPressed(UP_KEYS);
 
 		var pressed = useJustPressed ? FlxG.mouse.justPressed : FlxG.mouse.pressed;
 
