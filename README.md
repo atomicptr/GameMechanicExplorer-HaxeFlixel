@@ -1,4 +1,4 @@
-# [Game Mechanic Explorer - HaxeFlixel Edition](http://gme.kasoki.de) (WIP)
+# [Game Mechanic Explorer - HaxeFlixel Edition](https://atomicptr.github.io/GameMechanicExplorer-HaxeFlixel/) (WIP)
 
 This project is based on [John Watsons - Game Mechanic Explorer](http://gamemechanicexplorer.com/) (You should check out this link, very cool). Credits for the Assets and the thoughts behind the code go to him, I've merely ported his examples to HaxeFlixel :).
 
